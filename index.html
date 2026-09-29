@@ -1,0 +1,306 @@
+
+function loadPresets(){
+  if(!confirm("28 шаблон кошулат?"))return;
+  for(var i=0;i<PRESETS.length;i++){
+    var p=PRESETS[i];
+    templates.push({id:Date.now()+i,cat:p.cat,tier:p.tier,title:p.title,desc:p.desc,price:getTierPrice(p.tier),old:getTierPrice(p.tier)*2,badge:p.badge,img:p.img,music:""});
+  }
+  saveTemplates();renderHome();showToast("✅ "+PRESETS.length+" шаблон кошулду");
+}
+function clearTemplates(){
+  if(!confirm("Бардык шаблондорду өчүрөбүзбү?"))return;
+  templates=[];saveTemplates();renderHome();renderTplAdmin();showToast("🗑️ Өчүрүлдү");
+}
+function openTplForm(){
+  document.getElementById("tfTitle").value="";
+  document.getElementById("tfDesc").value="";
+  document.getElementById("tfPrice").value="";
+  document.getElementById("tfOld").value="";
+  document.getElementById("tfBadge").value="";
+  document.getElementById("tfImgUrl").value="";
+  document.getElementById("tfMusicUrl").value="";
+  document.getElementById("tfImgPreview").style.display="none";
+  document.getElementById("tfImgPreview").src="";
+  window._tfImgData=null;
+  openModal("tplFormModal");
+}
+function previewTplImg(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){window._tfImgData=ev.target.result;var img=document.getElementById("tfImgPreview");img.src=ev.target.result;img.style.display="block";};
+  r.readAsDataURL(f);
+}
+function saveTplForm(){
+  var title=document.getElementById("tfTitle").value.trim();
+  if(!title){showToast("❌ Аталыш",true);return;}
+  var tier=parseInt(document.getElementById("tfTier").value)||3;
+  var price=parseInt(document.getElementById("tfPrice").value)||getTierPrice(tier);
+  var img=window._tfImgData||document.getElementById("tfImgUrl").value||"";
+  templates.push({
+    id:Date.now(),
+    cat:document.getElementById("tfCat").value,
+    tier:tier,
+    title:title,
+    desc:document.getElementById("tfDesc").value,
+    price:price,
+    old:parseInt(document.getElementById("tfOld").value)||0,
+    badge:document.getElementById("tfBadge").value,
+    img:img,
+    music:document.getElementById("tfMusicUrl").value||""
+  });
+  saveTemplates();renderHome();renderTplAdmin();closeModal("tplFormModal");showToast("✅ Шаблон сакталды");
+}
+function renderTplAdmin(){
+  var box=document.getElementById("tplAdminList");if(!box)return;
+  if(!templates.length){box.innerHTML='<p class="empty">Шаблон жок</p>';return;}
+  box.innerHTML="";
+  for(var i=templates.length-1;i>=0;i--){
+    var t=templates[i];
+    var el=document.createElement("div");el.className="a-item";
+    el.innerHTML=(t.img?'<img src="'+t.img+'" onerror="this.style.display=\'none\'">':'<div style="width:50px;height:50px;background:var(--brd);border-radius:8px"></div>')+
+      '<div class="info"><h4>'+t.title+'</h4><p>'+t.cat+' · '+(TIER_NAMES[t.tier||3]||'')+' · '+(t.price||getTierPrice(t.tier||3))+' сом</p></div>'+
+      '<button class="btn red" style="width:auto;padding:6px 10px;font-size:11px;margin:0" onclick="deleteTpl('+t.id+')">🗑️</button>';
+    box.appendChild(el);
+  }
+}
+function deleteTpl(id){
+  if(!confirm("Өчүрөбүзбү?"))return;
+  templates=templates.filter(function(t){return t.id!==id;});
+  saveTemplates();renderHome();renderTplAdmin();showToast("🗑️");
+}
+function loadConvFile(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){var img=document.getElementById("convPreview");img.src=ev.target.result;img.style.display="block";window._convData=ev.target.result;};
+  r.readAsDataURL(f);
+}
+function convertTo(mime,ext){
+  if(!window._convData){showToast("❌ Сүрөт тандаңыз",true);return;}
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement("canvas");c.width=img.width;c.height=img.height;
+    c.getContext("2d").drawImage(img,0,0);
+    c.toBlob(function(blob){
+      var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="converted."+ext;a.click();
+      showToast("✅ "+ext.toUpperCase());
+    },mime,0.92);
+  };
+  img.src=window._convData;
+}
+
+function loadMusicFile(e){
+  var f=e.target.files[0];if(!f)return;
+  if(f.size>8*1024*1024){showToast("❌ Файл 8MB ашпасын",true);return;}
+  var r=new FileReader();
+  r.onload=function(ev){
+    inviteMusicData=ev.target.result;
+    document.getElementById("fMusicUrl").value="";
+    if(!document.getElementById("fMusicName").value){
+      document.getElementById("fMusicName").value=f.name.replace(/\.[^.]+$/,"");
+    }
+    var st=document.getElementById("musicFileStatus");
+    st.style.display="block";
+    st.innerText="✅ Файл жүктөлдү: "+f.name+" ("+Math.round(f.size/1024)+" KB)";
+    showToast("🎵 Музыка файлы даяр");
+  };
+  r.readAsDataURL(f);
+}
+function onMusicUrlInput(){
+  var v=document.getElementById("fMusicUrl").value.trim();
+  if(v){inviteMusicData=v;document.getElementById("musicFileStatus").style.display="none";}
+}
+
+function saveInviteToStore(inv){
+  try{
+    var all=JSON.parse(localStorage.getItem("tilata_invites")||"{}");
+    all[inv.id]=inv;
+    localStorage.setItem("tilata_invites",JSON.stringify(all));
+    localStorage.setItem("tilata_invite_current",JSON.stringify(inv));
+  }catch(e){showToast("⚠️ Эстутум толук — сүрөт/музыканы кичирейтиңиз",true);}
+}
+function getInviteById(id){
+  try{
+    var all=JSON.parse(localStorage.getItem("tilata_invites")||"{}");
+    if(all[id])return all[id];
+    var cur=JSON.parse(localStorage.getItem("tilata_invite_current")||"null");
+    if(cur&&cur.id===id)return cur;
+  }catch(e){}
+  return null;
+}
+function buildShareUrl(id){
+  var base=location.href.split("?")[0].split("#")[0];
+  return base+"?invite="+encodeURIComponent(id);
+}
+function showShareUI(inv){
+  var box=document.getElementById("shareBox");
+  if(!box||!inv)return;
+  var link=buildShareUrl(inv.id);
+  document.getElementById("shareLinkText").innerText=link;
+  box.style.display="block";
+  window._shareUrl=link;
+  window._shareInv=inv;
+}
+function copyShareLink(){
+  var t=window._shareUrl||"";
+  if(!t)return;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){showToast("📋 Көчүрүлдү");}).catch(function(){fallbackCopy(t);});
+  } else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");showToast("📋 Көчүрүлдү");}catch(e){showToast(t);}
+  document.body.removeChild(ta);
+}
+function shareWhatsApp(){
+  var inv=window._shareInv;if(!inv)return;
+  var link=window._shareUrl||"";
+  var text="🎉 "+(inv.type||"Той")+" чакыруусу\n\n"+(inv.names||"")+"\n\n"+link;
+  window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
+}
+function downloadInviteHtml(){
+  var inv=window._shareInv;
+  if(!inv){try{inv=JSON.parse(localStorage.getItem("tilata_invite_current")||"null");}catch(e){}}
+  if(!inv){showToast("❌ Чакыруу жок",true);return;}
+  var html=buildStandaloneInvite(inv);
+  var blob=new Blob([html],{type:"text/html;charset=utf-8"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="chakiruи-"+inv.id+".html";
+  a.click();
+  showToast("⬇️ Файл жүктөлдү");
+}
+function buildStandaloneInvite(inv){
+  var th=THEMES[inv.theme||1]||THEMES[1];
+  var dateStr="";
+  if(inv.date){
+    var d=new Date(inv.date);
+    var m=["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
+    dateStr=d.getFullYear()+"-ж., "+d.getDate()+"-"+m[d.getMonth()]+" • "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  }
+  var photo=inv.photo?'<img src="'+inv.photo+'" style="max-width:100%;border-radius:10px;margin:12px 0;border:2px solid #e5b53b">':'';
+  var music="";
+  if(inv.musicUrl){
+    music='<div style="margin:16px 0;padding:12px;background:#0f0f15;border-radius:10px"><button id="mbtn" style="width:48px;height:48px;border-radius:50%;background:#e5b53b;border:none;font-size:18px;cursor:pointer">▶</button> <b style="color:#e5b53b">'+(inv.musicName||"Музыка")+'</b><audio id="maud" src="'+inv.musicUrl+'" loop></audio></div><script>document.getElementById("mbtn").onclick=function(){var a=document.getElementById("maud");if(a.paused){a.play();this.innerText="⏸";}else{a.pause();this.innerText="▶";}}<\/script>';
+  }
+  var sch="";
+  if(inv.sch&&inv.sch.length){
+    sch='<div style="margin:16px 0;text-align:left"><h3 style="color:#e5b53b">🕐 Программа</h3>';
+    for(var i=0;i<inv.sch.length;i++) sch+='<div style="padding:8px 0;border-bottom:1px solid #2a2a3a"><b style="color:#e5b53b">'+inv.sch[i].time+'</b> — '+inv.sch[i].text+'</div>';
+    sch+='</div>';
+  }
+  var map="";
+  if(inv.map){
+    var enc=encodeURIComponent(inv.map);
+    map='<div style="margin:16px 0"><h3 style="color:#e5b53b">🗺️ '+inv.map+'</h3><p><a href="https://2gis.kg/search/'+enc+'" style="color:#e5b53b">2GIS</a> · <a href="https://yandex.ru/maps/?text='+enc+'" style="color:#e74c3c">Яндекс</a> · <a href="https://www.google.com/maps/search/'+enc+'" style="color:#3b82f6">Google</a></p></div>';
+  }
+  return '<!DOCTYPE html><html lang="ky"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+(inv.names||"Чакыруу")+'</title><style>body{margin:0;font-family:system-ui,sans-serif;background:'+th[0]+';color:#fff;text-align:center;padding:20px}.card{background:'+th[1]+';border:2px solid #e5b53b;border-radius:16px;padding:28px 18px;max-width:480px;margin:0 auto}h1{font-family:Georgia,serif;color:#e5b53b;font-size:28px;margin:8px 0}.top{letter-spacing:3px;color:#e5b53b;font-size:11px;text-transform:uppercase}.msg{color:#d4c5a0;font-style:italic;margin:12px 0}.loc{color:#e5b53b;font-weight:700}</style></head><body><div class="card"><div class="top">'+(inv.type||"")+'</div><div style="font-size:22px;margin:10px 0">🤍</div>'+photo+'<h1>'+(inv.names||"")+'</h1><div style="color:#e8d5b0;font-weight:600">'+dateStr+'</div><div class="msg">'+(inv.msg||"")+'</div><div class="loc">'+(inv.loc||"")+'</div><div style="color:#e8d5b0;font-size:12px">'+(inv.addr||"")+'</div>'+music+sch+map+'</div><p style="color:#9a9aae;font-size:11px;margin-top:20px">TILATA INVITE</p></body></html>';
+}
+function renderMyInvites(){
+  var box=document.getElementById("myInvitesBox");if(!box)return;
+  try{
+    var all=JSON.parse(localStorage.getItem("tilata_invites")||"{}");
+    var keys=Object.keys(all);
+    if(!keys.length){box.innerHTML="";return;}
+    var html='<div class="schedule"><h3>📂 Менин чакырууларым</h3>';
+    for(var i=keys.length-1;i>=0;i--){
+      var inv=all[keys[i]];
+      html+='<div class="sch-item" style="cursor:pointer" onclick="openSavedInvite(\''+inv.id+'\')"><div class="sch-time" style="min-width:auto">'+(inv.type||"")+'</div><div class="sch-text">'+(inv.names||"")+' · <span style="color:var(--gold)">'+inv.id+'</span></div></div>';
+    }
+    html+='</div>';
+    box.innerHTML=html;
+  }catch(e){box.innerHTML="";}
+}
+function openSavedInvite(id){
+  var inv=getInviteById(id);
+  if(!inv){showToast("❌ Табылган жок",true);return;}
+  localStorage.setItem("tilata_invite_current",JSON.stringify(inv));
+  renderInviteView(inv);
+  showShareUI(inv);
+  showStep("stepDone");
+  showToast("✅ Ачылды: "+inv.names);
+}
+
+function confirmPaid(){
+  var inv=getFormInvite();
+  saveInviteToStore(inv);
+  renderInviteView(inv);
+  showShareUI(inv);
+  showStep("stepDone");
+  var cb=document.getElementById("checkLinkBox");
+  if(cb){
+    cb.innerHTML='<div class="check-box"><p style="color:var(--green);font-weight:700">✅ Төлөм ырасталды!</p><p style="font-size:12px;color:var(--muted)">Чакыруу сакталды. Төмөндөгү шилтемени конокторго жөнөтүңүз.</p></div>';
+  }
+  renderMyInvites();
+  showToast("✅ Төлөм кабыл алынды!");
+}
+function previewNextStep(){
+  if(isAdmin){
+    var inv=getFormInvite();
+    saveInviteToStore(inv);
+    renderInviteView(inv);
+    showShareUI(inv);
+    showStep("stepDone");
+    renderMyInvites();
+    showToast("👑 Бекер алынды!");
+  } else {goToPayment();}
+}
+
+function tryLoadInviteFromUrl(){
+  var params=new URLSearchParams(location.search);
+  var id=params.get("invite")||params.get("id")||params.get("check");
+  if(!id)return false;
+  var inv=getInviteById(id);
+  if(inv){
+    renderInviteView(inv);
+    showShareUI(inv);
+    showStep("stepDone");
+    showToast("📩 Чакыруу ачылды");
+    return true;
+  }
+  showToast("⚠️ Бул шилтеме ушул түзмөктө сакталган чакырууну гана ачат. HTML файл жүктөп бөлүшүңүз.",true);
+  return false;
+}
+
+function renderMusicDisplay(inv, boxId, btnId){
+  var box=document.getElementById(boxId);
+  if(!inv || !inv.musicUrl){if(box)box.innerHTML="";return;}
+  var name=inv.musicName||"Музыка";
+  box.innerHTML='<div class="music-box"><h3>🎵 Тойдун музыкасы</h3><div class="music-player"><button class="music-play" id="'+btnId+'" onclick="toggleMusicAny(\''+boxId+'\',\''+btnId+'\')">▶</button><div class="music-info"><div class="music-name">'+name+'</div><div class="music-sub">Басуу менен ойнотуңуз</div></div></div></div>';
+  window["_url_"+boxId]=inv.musicUrl;
+  setTimeout(function(){autoPlayMusic(boxId,btnId,inv.musicUrl);},400);
+}
+function toggleMusicAny(boxId,btnId){
+  var musicUrl=window["_url_"+boxId];
+  if(!musicUrl){showToast("⚠️ Музыка жок",true);return;}
+  var btn=document.getElementById(btnId);
+  var audio=window["_aud_"+boxId];
+  if(!audio){audio=new Audio(musicUrl);audio.loop=true;window["_aud_"+boxId]=audio;}
+  var playing=window["_pl_"+boxId]||false;
+  if(playing){audio.pause();window["_pl_"+boxId]=false;if(btn)btn.innerText="▶";}
+  else{
+    audio.play().then(function(){if(btn)btn.innerText="⏸";window["_pl_"+boxId]=true;})
+      .catch(function(){showToast("⚠️ Дагы бир жолу басыңыз",true);});
+  }
+}
+function autoPlayMusic(boxId,btnId,musicUrl){
+  if(!musicUrl)return;
+  var btn=document.getElementById(btnId);if(!btn)return;
+  var audio=new Audio(musicUrl);audio.loop=true;audio.volume=0.75;
+  window["_aud_"+boxId]=audio;
+  window["_url_"+boxId]=musicUrl;
+  audio.play().then(function(){btn.innerText="⏸";window["_pl_"+boxId]=true;})
+    .catch(function(){btn.innerText="▶";btn.style.boxShadow="0 0 12px var(--gold)";});
+}
+
+function initApp(){
+  renderHome();
+  updateAdminBtn();
+  addSchRow("17:00","Конокторду тосуп алуу");
+  addSchRow("18:00","Тойдун башталышы");
+  tryLoadInviteFromUrl();
+}
+document.addEventListener("DOMContentLoaded",initApp);
+</script>
+</body>
+</html>
