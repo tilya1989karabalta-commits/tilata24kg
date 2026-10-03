@@ -1,0 +1,2887 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CHAKYRUU — Санарип той чакыруу</title>
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Cormorant+Garamond:wght@400;600;700&family=Crimson+Text:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=EB+Garamond:wght@400;500;600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=Nunito:wght@300;400;600;700&family=Open+Sans:wght@300;400;500;600;700&family=Pacifico&family=Parisienne&family=Poppins:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&family=Pinyon+Script&family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Sacramento&family=Satisfy&family=Source+Sans+3:wght@300;400;500;600;700&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
+<style>
+:root {
+  --pink: #e91e63;
+  --pink2: #f06292;
+  --orange: #ff8a00;
+  --orange2: #ff6b00;
+  --gold: #c9a66b;
+  --gold2: #d4af37;
+  --dark: #1a1a1a;
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #8e8e93;
+  --accent: #ff8a00;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans', 'Montserrat', 'Roboto', sans-serif;
+  background: #f5f5f7;
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.inv-text, .rsvp-opt, .cd-item, .hosts-name,
+.bottom-bar, .field input, .field select, .field textarea,
+.modal, .chip, .btn-sm, .btn-main, .btn-next, .btn-back, .btn-rsvp,
+#invPlace, #invAddress, #invDate, #invTime, #invDay, #invHosts, #invText {
+  font-family: 'Noto Sans', 'Inter', 'Roboto', 'Montserrat', sans-serif !important;
+}
+.date-card .label, .rsvp-box h3, .elegant-title {
+  font-family: 'Cormorant Garamond', 'Noto Serif', 'Playfair Display', serif !important;
+}
+.topbar {
+  position: sticky; top:0; z-index:50;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); letter-spacing: 1px; }
+.top-actions { display:flex; gap:8px; align-items:center; }
+.online-status {
+  font-size: 0.7rem; padding: 3px 8px; border-radius: 10px;
+  background: #eee; color: #888;
+}
+.online-status.ok { background: #e8f5e9; color: #2e7d32; }
+.online-status.err { background: #ffebee; color: #c62828; }
+.btn-sm {
+  padding: 8px 14px; border-radius: 20px; font-size: 0.8rem;
+  border: 1px solid #ddd; background: #fff; cursor: pointer;
+}
+.btn-sm.pink { background: linear-gradient(135deg,#ff8a00,#ff5a00); color:#fff; border:none; }
+.btn-sm.dark { background: var(--dark); color: var(--gold); border:none; }
+
+.screen { display:none; min-height: calc(100vh - 60px); }
+.screen.active { display:block; }
+
+.tpl-section { padding: 8px 16px 50px; }
+.tpl-section h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 14px; color: var(--dark); }
+.tpl-tabs {
+  display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; padding-bottom: 4px;
+}
+.tpl-tab {
+  flex-shrink: 0; padding: 10px 18px; border-radius: 24px;
+  border: 1.5px solid #e8e8ed; background: #fff; font-size: 0.88rem;
+  font-weight: 600; color: #555; cursor: pointer;
+}
+.tpl-tab.active {
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 14px rgba(255,138,0,0.35);
+}
+.price-banner {
+  background: #fff8e8; border: 1px solid #ffe0a3; border-radius: 14px;
+  padding: 10px 14px; margin-bottom: 16px; font-size: 0.9rem; color: #8a6d00;
+  display: flex; align-items: center; gap: 8px;
+}
+.tpl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tpl-card {
+  background: transparent; border-radius: 0; overflow: visible;
+  box-shadow: none; cursor: pointer; transition: 0.2s;
+  border: none; text-align: center;
+}
+.tpl-card:hover { transform: translateY(-3px); }
+.tpl-card.selected .phone-frame { box-shadow: 0 0 0 3px var(--orange), 0 12px 28px rgba(0,0,0,0.15); }
+.phone-frame {
+  background: #111; border-radius: 18px; padding: 8px 6px 10px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  position: relative; overflow: hidden;
+}
+.phone-frame::before {
+  content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  width: 36px; height: 5px; background: #333; border-radius: 4px; z-index: 2;
+}
+.phone-frame img, .phone-frame .phone-bg {
+  width: 100%; height: 200px; object-fit: cover; border-radius: 12px;
+  display: block; background: #eee;
+}
+.tpl-card .info { padding: 10px 4px 0; text-align: left; }
+.tpl-card .info b { font-size: 0.9rem; color: var(--dark); display: block; }
+.tpl-card .info span { font-size: 0.78rem; color: var(--muted); }
+.tpl-card .info .price { color: var(--orange); font-weight: 700; font-size: 0.85rem; margin-top: 2px; }
+.btn-view {
+  display: inline-block; margin-top: 8px; padding: 8px 16px;
+  background: var(--orange); color: #fff; border: none; border-radius: 10px;
+  font-size: 0.78rem; font-weight: 600; cursor: pointer; width: 100%;
+}
+.badge-new {
+  position: absolute; top: 14px; left: 10px; z-index: 3;
+  background: #22c55e; color: #fff; font-size: 0.65rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 8px;
+}
+
+.wizard-header {
+  background: #fff; padding: 16px; border-bottom: 1px solid #eee;
+  position: sticky; top: 60px; z-index: 40;
+}
+.wizard-header .back { font-size: 0.9rem; color: var(--muted); cursor: pointer; margin-bottom: 8px; display:inline-block; }
+.wizard-header h2 { font-size: 1.15rem; color: var(--dark); }
+.steps {
+  display: flex; gap: 6px; margin-top: 14px; align-items: center;
+}
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #eee; color: #999; font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600;
+}
+.step-dot.active { background: var(--pink); color: #fff; }
+.step-dot.done { background: #4caf50; color: #fff; }
+.step-line { flex:1; height: 2px; background: #eee; }
+.step-line.done { background: #4caf50; }
+
+.wizard-body { padding: 20px 16px 100px; }
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px;
+}
+.field label span { color: var(--pink); }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 14px 16px; border-radius: 14px;
+  border: 1.5px solid #e0e0e0; background: #fff;
+  font-size: 0.95rem; font-family: inherit; color: var(--text);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--pink);
+}
+.field textarea { min-height: 100px; resize: vertical; }
+.hint {
+  background: #e3f2fd; border-radius: 12px; padding: 12px 14px;
+  font-size: 0.82rem; color: #1565c0; margin-bottom: 16px;
+}
+.wizard-footer {
+  position: fixed; bottom:0; left:0; right:0;
+  background: #fff; padding: 12px 16px;
+  border-top: 1px solid #eee; display: flex; gap: 10px;
+  z-index: 50;
+}
+.btn-next {
+  flex:1; padding: 15px; border-radius: 30px; border: none;
+  background: linear-gradient(135deg, #ff8a00, #ff5a00);
+  color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;
+}
+.btn-next:disabled { opacity: 0.5; }
+.btn-back {
+  padding: 15px 20px; border-radius: 30px;
+  border: 1.5px solid #ddd; background: #fff; color: var(--text);
+  font-size: 0.95rem; cursor: pointer;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 9px 14px; border-radius: 20px; font-size: 0.8rem;
+  border: 1.5px solid #e0e0e0; background: #fff; cursor: pointer;
+}
+.chip.active { border-color: var(--pink); background: #fce4ec; color: var(--pink); }
+
+.invite-page {
+  background: #faf6f0; min-height: 100vh; padding-bottom: 80px;
+}
+.seal-screen {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 24px 16px 40px;
+  position: relative; overflow: hidden;
+}
+.seal-screen::before, .seal-screen::after {
+  content: ''; position: absolute; top: 0; width: 55%; height: 42%;
+  z-index: 0; pointer-events: none;
+}
+.seal-screen::before { left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.seal-screen::after { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.seal-inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+.seal-invite-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem; letter-spacing: 3px; margin-bottom: 6px; opacity: 0.9;
+}
+.seal-script {
+  font-family: 'Great Vibes', cursive;
+  font-size: 2.4rem; line-height: 1.2; margin: 4px 0 18px;
+}
+.seal {
+  width: 120px; height: 120px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 0.8rem;
+  font-weight: 700; letter-spacing: 1px;
+  cursor: pointer; transition: transform 0.25s;
+  margin: 18px 0 12px; position: relative; z-index: 3;
+  border: 3px solid rgba(255,255,255,0.25);
+}
+.seal:active { transform: scale(0.94); }
+.seal-hint { font-size: 0.8rem; opacity: 0.75; margin-top: 4px; }
+.seal-crest { width: 90px; height: 100px; margin-top: 18px; opacity: 0.8; }
+.seal-crest svg { width: 100%; height: 100%; }
+
+.env-navy { background: linear-gradient(180deg,#1a2744,#0f1a2e); color:#f5f0e6; }
+.env-navy::before, .env-navy::after { background: linear-gradient(160deg,#243556,#152238); }
+.env-navy .seal {
+  background: radial-gradient(circle at 35% 30%,#f0d78c,#c9a227 55%,#8a7010);
+  color:#3d2e08; box-shadow: 0 10px 28px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.35);
+}
+.env-classic { background: linear-gradient(180deg,#e8dcc8,#d4c4a8); color:#5c3a0a; }
+.env-classic::before, .env-classic::after { background: linear-gradient(160deg,#ddd0b8,#c9b896); }
+.env-classic .seal {
+  background: radial-gradient(circle at 35% 30%,#e8d5a3,#b8860b 60%,#8b6914);
+  color:#5c3a0a; box-shadow: 0 8px 30px rgba(0,0,0,0.25), inset 0 2px 8px rgba(255,255,255,0.3);
+}
+.env-burgundy { background: linear-gradient(180deg,#4a1528,#2a0c18); color:#f5e6c8; }
+.env-burgundy::before, .env-burgundy::after { background: linear-gradient(160deg,#5c1a32,#3a1020); }
+.env-burgundy .seal {
+  background: radial-gradient(circle at 35% 30%,#f0d78c,#c9a227 55%,#8a7010);
+  color:#3d2e08; box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+}
+.env-blackgold { background: linear-gradient(180deg,#111,#1c1c1c); color:#d4af37; }
+.env-blackgold::before, .env-blackgold::after { background: linear-gradient(160deg,#222,#111); }
+.env-blackgold .seal {
+  background: radial-gradient(circle at 35% 30%,#f5e6a8,#d4af37 50%,#9a7b1a);
+  color:#1a1400; box-shadow: 0 10px 32px rgba(212,175,55,0.25);
+}
+.env-rose { background: linear-gradient(180deg,#f7e4ea,#f0cfd9); color:#6b2d45; }
+.env-rose::before, .env-rose::after { background: linear-gradient(160deg,#fceef2,#e8b8c8); }
+.env-rose .seal {
+  background: radial-gradient(circle at 35% 30%,#f5c6d0,#c76b8a 55%,#8a3d58);
+  color:#fff; box-shadow: 0 8px 24px rgba(139,61,88,0.3);
+}
+.env-emerald { background: linear-gradient(180deg,#0d3326,#072018); color:#e8f5e9; }
+.env-emerald::before, .env-emerald::after { background: linear-gradient(160deg,#145c42,#0a2e20); }
+.env-emerald .seal {
+  background: radial-gradient(circle at 35% 30%,#f0d78c,#c9a227 55%,#8a7010);
+  color:#3d2e08; box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+}
+.env-ivory { background: linear-gradient(180deg,#faf6f0,#f0e6d6); color:#4a3728; }
+.env-ivory::before, .env-ivory::after { background: linear-gradient(160deg,#fff9f0,#e8dcc8); }
+.env-ivory .seal {
+  background: radial-gradient(circle at 35% 30%,#e8d5a3,#b8860b 60%,#8b6914);
+  color:#5c3a0a; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.env-purple { background: linear-gradient(180deg,#2a1a40,#1a1028); color:#e8d5ff; }
+.env-purple::before, .env-purple::after { background: linear-gradient(160deg,#3d2860,#241848); }
+.env-purple .seal {
+  background: radial-gradient(circle at 35% 30%,#f0d78c,#c9a227 55%,#8a7010);
+  color:#3d2e08; box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+}
+.invite-content { display: none; overflow: hidden; }
+.invite-content.show { display: block; animation: fadeIn 0.8s; }
+.invite-content.auto-scroll {
+  display: block;
+  max-height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+.bg-live.zoom { animation: kenBurns 12s ease-in-out infinite alternate; }
+.bg-live.shine { position: relative; overflow: hidden; }
+.bg-live.shine::before {
+  content:''; position:absolute; inset:0; z-index:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  animation: shine 3s infinite;
+}
+.bg-live.fade { animation: fadePulse 4s ease-in-out infinite; }
+
+.inv-section { text-align: center; padding: 30px 20px; }
+.inv-section.bg-img {
+  background-size: cover; background-position: center;
+  min-height: 260px; display: flex; flex-direction: column;
+  justify-content: flex-end; color: #fff;
+  position: relative;
+}
+.inv-section.bg-img::after {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(transparent 40%, rgba(0,0,0,0.5));
+}
+.inv-section.bg-img > * { position: relative; z-index:1; }
+
+.wedding-day {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 4px; font-size: 0.95rem; color: var(--gold);
+  margin-bottom: 8px;
+}
+.names {
+  font-family: 'Great Vibes', cursive;
+  font-size: 2.8rem; color: #8b6f3e; line-height: 1.15;
+}
+.names .amp { font-size: 1.6rem; display:block; margin: 4px 0; }
+.inv-text {
+  font-size: 0.95rem; line-height: 1.75; color: #555;
+  max-width: 340px; margin: 0 auto; white-space: pre-line;
+}
+.date-card {
+  background: #fff; border-radius: 20px; padding: 24px;
+  margin: 20px auto; max-width: 300px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+}
+.date-card .label { font-family: 'Cormorant Garamond', 'Noto Serif', 'Playfair Display', serif; font-size: 1.35rem; font-weight: 600; color: var(--gold); letter-spacing: 0.5px; }
+.date-card .big { font-size: 1.3rem; font-weight: 600; margin: 8px 0; font-family: 'Noto Sans', 'Montserrat', sans-serif; }
+.day-badge {
+  display: inline-block; border: 1.5px solid var(--gold);
+  padding: 4px 18px; border-radius: 20px; font-size: 0.85rem; margin-top: 6px;
+  font-family: 'Noto Sans', 'Montserrat', sans-serif;
+}
+.countdown {
+  display: flex; justify-content: center; gap: 12px; margin: 20px 0;
+}
+.cd-item {
+  background: #fff; border-radius: 14px; padding: 12px 10px;
+  min-width: 64px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.cd-item .num { font-size: 1.5rem; font-weight: 700; color: var(--dark); font-family: 'Noto Sans', 'Montserrat', sans-serif; }
+.cd-item .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; font-family: 'Noto Sans', 'Montserrat', sans-serif; }
+.rsvp-box {
+  background: #fff; border-radius: 20px; padding: 24px;
+  margin: 20px 16px; box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+}
+.rsvp-box h3 { font-family: 'Cormorant Garamond', 'Noto Serif', 'Playfair Display', serif; font-size: 1.45rem; font-weight: 600; color: var(--gold); margin-bottom: 14px; letter-spacing: 0.5px; }
+.rsvp-opt {
+  display: block; width: 100%; text-align: left;
+  padding: 14px 16px; border-radius: 14px; margin-bottom: 8px;
+  border: 1.5px solid #e0e0e0; background: #fff; cursor: pointer;
+  font-size: 0.95rem;
+}
+.rsvp-opt.selected { border-color: var(--gold); background: #faf6ee; }
+.btn-rsvp {
+  width: 100%; padding: 14px; border-radius: 30px; border: none;
+  background: var(--dark); color: var(--gold); font-size: 1rem;
+  font-weight: 600; margin-top: 12px; cursor: pointer;
+}
+.hosts-name {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 2px; font-size: 1.1rem; margin-top: 8px;
+}
+.bottom-bar {
+  position: fixed; bottom:0; left:0; right:0;
+  background: #fff; padding: 10px 16px;
+  display: flex; gap: 10px; border-top: 1px solid #eee;
+  z-index: 60;
+}
+.bottom-bar button {
+  flex:1; padding: 12px; border-radius: 25px; font-size: 0.9rem;
+  font-weight: 600; cursor: pointer; border: none;
+}
+.btn-share { background: #4caf50; color: #fff; }
+.btn-buy { background: linear-gradient(135deg, #ff9800, #f57c00); color: #fff; }
+
+.modal-bg {
+  position: fixed !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important;
+  background: rgba(0,0,0,0.65);
+  z-index: 9999 !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-bg.show { display: flex !important; }
+.modal {
+  background: #fff; border-radius: 20px;
+  width: 100%; max-width: 400px; max-height: 85vh;
+  overflow-y: auto; padding: 28px 22px 32px;
+  animation: popIn 0.25s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+@keyframes popIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:none; } }
+.modal h3 { font-size: 1.2rem; margin-bottom: 16px; text-align: center; }
+.modal input, .modal select {
+  width: 100%; padding: 13px 14px; border-radius: 12px;
+  border: 1.5px solid #e0e0e0; margin-bottom: 12px; font-size: 0.95rem;
+}
+.modal .btn-full {
+  width: 100%; padding: 14px; border-radius: 30px; border: none;
+  background: var(--pink); color: #fff; font-size: 1rem; font-weight: 600;
+  margin-top: 8px; cursor: pointer;
+}
+.modal .btn-outline {
+  width: 100%; padding: 13px; border-radius: 30px;
+  border: 1.5px solid #ddd; background: #fff; margin-top: 8px; cursor: pointer;
+}
+.admin-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border: 1px solid #eee; border-radius: 14px; margin-bottom: 10px;
+}
+.admin-item img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
+.admin-item .meta { flex:1; }
+.admin-item .meta b { font-size: 0.9rem; }
+.admin-item .meta span { font-size: 0.78rem; color: var(--muted); }
+
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: var(--dark); color: var(--gold); padding: 12px 24px;
+  border-radius: 30px; font-size: 0.9rem; z-index: 300;
+  opacity: 0; transition: 0.3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+.price-box {
+  background: linear-gradient(135deg, #fff8e1, #fff3e0);
+  border: 1.5px solid var(--gold); border-radius: 16px;
+  padding: 18px; text-align: center; margin: 16px 0;
+}
+.price-box .amount { font-size: 1.8rem; font-weight: 700; color: var(--pink); }
+
+.fx-zoom {
+  animation: kenBurns 8s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+@keyframes kenBurns {
+  0% { transform: scale(1) translate(0,0); }
+  50% { transform: scale(1.12) translate(-2%, -1%); }
+  100% { transform: scale(1.18) translate(1%, 2%); }
+}
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes pulseSeal {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 28px rgba(0,0,0,0.35); }
+  50% { transform: scale(1.06); box-shadow: 0 14px 36px rgba(201,162,107,0.45); }
+}
+.seal {
+  animation: pulseSeal 2.2s ease-in-out infinite;
+  background: linear-gradient(145deg, #d4af37, #b8860b) !important;
+  color: #2c2416 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.inv-section .date-card { animation: floatSoft 4s ease-in-out infinite; }
+.bg-live.zoom { animation: kenBurns 14s ease-in-out infinite alternate; }
+
+.fx-shine {
+  position: relative; overflow: hidden;
+}
+.fx-shine::after {
+  content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: shine 2.5s infinite;
+}
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 150%; }
+}
+.fx-3d {
+  transform: perspective(600px) rotateY(8deg);
+  transition: transform 0.4s;
+}
+.fx-3d:hover { transform: perspective(600px) rotateY(-8deg) scale(1.03); }
+.fx-fade {
+  animation: fadePulse 3s ease-in-out infinite;
+}
+@keyframes fadePulse {
+  0%,100% { opacity:1; }
+  50% { opacity:0.6; }
+}
+
+.story-title {
+  font-family: 'Great Vibes', 'Pinyon Script', cursive;
+  font-size: 2.1rem;
+  color: #8b6f3e;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.story-block {
+  padding: 36px 22px !important;
+  background: #faf6ee;
+}
+.story-hero, .story-mid, .story-bottom {
+  position: relative;
+  overflow: hidden;
+}
+.story-hero::after, .story-mid::after, .story-bottom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 40%, transparent 70%);
+  pointer-events: none;
+}
+.story-hero > *, .story-bottom > * { position: relative; z-index: 2; }
+.fade-in-sec {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-in-sec.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === MP3 Upload UI === */
+.mp3-upload-box {
+  border: 2px dashed #c9a66b;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  background: #fffaf0;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.mp3-upload-box:hover {
+  background: #fff5e0;
+  border-color: #b8860b;
+}
+.mp3-upload-box .icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+.mp3-upload-box .text {
+  font-size: 0.85rem;
+  color: #8a6d00;
+  font-weight: 600;
+}
+.mp3-upload-box .subtext {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 4px;
+}
+.mp3-preview {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0f7ff;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+.mp3-preview audio {
+  flex: 1;
+  height: 36px;
+}
+.mp3-preview .remove {
+  background: #ffebee;
+  color: #c62828;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Preview mode badge */
+.preview-badge {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+  display: none;
+}
+.preview-badge.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo" style="font-family:Inter,sans-serif;font-weight:800;letter-spacing:-0.5px;color:#1a1a1a;font-size:1.15rem;">CHAKYR<span style="color:#ff8a00;">UU</span></div>
+  <div class="top-actions">
+    <span class="online-status" id="onlineStatus">● ...</span>
+    <button class="btn-sm" id="adminBtn" onclick="openAdmin()">Админ</button>
+    <button class="btn-sm pink" onclick="startWizard()">+ Түзүү</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN 0: HOME ========== -->
+<div class="screen active" id="screenHome">
+  <div style="padding:14px 16px 0;">
+    <h2 style="font-size:1.4rem;font-weight:800;color:#1a1a1a;margin-bottom:12px;">Үлгүнү тандаңыз</h2>
+    <div class="tpl-tabs" id="tplTabs">
+      <button type="button" class="tpl-tab active" data-tab="all" onclick="filterTplTab(this,'all')">✨ Үлгүлөр</button>
+      <button type="button" class="tpl-tab" data-tab="vip" onclick="filterTplTab(this,'vip')">⭐ VIP</button>
+      <button type="button" class="tpl-tab" data-tab="custom" onclick="filterTplTab(this,'custom')">🎨 Жеке</button>
+    </div>
+    <div class="price-banner">💰 <b>990 сом</b>&nbsp;/ чакыруу · WhatsApp менен жөнөтүңүз</div>
+  </div>
+  <div class="tpl-section" style="padding-top:4px;">
+    <div class="tpl-grid" id="tplGrid"></div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: TEMPLATE PREVIEW (ДЕМО) ========== -->
+<div class="screen" id="screenPreview">
+  <div class="preview-badge show" id="previewBadge">👁️ ДЕМО КӨРҮҮ РЕЖИМИ</div>
+  <div class="invite-page">
+    <div class="seal-screen" id="previewSealScreen">
+      <div class="seal-inner">
+        <div class="seal-invite-label">СИЗ ЧАКЫРЫЛДЫҢЫЗ</div>
+        <div class="seal-script" id="previewSealScript">Тойго</div>
+        <div style="font-family:'Playfair Display',serif;font-size:0.95rem;letter-spacing:2px;opacity:0.85;margin-bottom:4px;" id="previewSealTitle">ҮЙЛӨНҮҮ ТОЮНА ЧАКЫРУУ</div>
+        <div class="seal" onclick="openPreviewSeal()">БАССЫЗ</div>
+        <div class="seal-hint">Басыңыз — музыка + живой эффект ✨</div>
+        <div class="seal-crest">
+          <svg viewBox="0 0 100 110" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M50 8 L88 28 L88 70 Q88 95 50 105 Q12 95 12 70 L12 28 Z" opacity="0.9"/>
+            <path d="M50 18 L78 32 L78 68 Q78 88 50 96 Q22 88 22 68 L22 32 Z" opacity="0.5"/>
+            <text x="50" y="62" text-anchor="middle" fill="currentColor" stroke="none" font-family="Great Vibes, cursive" font-size="22" id="previewCrestLetters">Д</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="invite-content" id="previewContent">
+      <div class="inv-section bg-img story-hero" id="previewHeroBg" style="min-height:78vh;background-size:cover;background-position:center;">
+        <div class="wedding-day" id="previewOverlay">WEDDING DAY</div>
+        <div class="names" id="previewNames">Айбек<br><span class="amp">&</span>Айгүл</div>
+      </div>
+
+      <div class="inv-section story-block fade-in-sec">
+        <div class="story-title">Урматтуу коноктор!</div>
+        <div class="inv-text" id="previewText">Урматтуу бир туугандар, куда-кудагыйлар, достор, классташтар, кесиптештер, кошуналар жана дагы сыйлуу коноктор!
+
+Сиз(дер)ди уулубуз менен келинибиздин үйлөнүү тоюна арналган салтанаттуу дасторконубузга кадырлуу конок болууга чакырабыз.</div>
+      </div>
+
+      <div class="inv-section bg-img story-mid" id="previewMidBg" style="display:none;min-height:55vh;background-size:cover;background-position:center;"></div>
+
+      <div class="inv-section story-block fade-in-sec">
+        <div class="story-title">Той күнү</div>
+        <div class="date-card" style="margin-top:8px;">
+          <div class="label" id="previewMonth">ОКТЯБРЬ</div>
+          <div class="big" id="previewDate">2 Октябрь 2026</div>
+          <div style="font-size:1.15rem;font-weight:600;margin-top:6px;" id="previewTime">саат 14:00</div>
+          <div class="day-badge" id="previewDay">Жума</div>
+        </div>
+        <div class="countdown" id="previewCountdown" style="margin-top:18px;"></div>
+      </div>
+
+      <div class="inv-section story-block fade-in-sec">
+        <div class="story-title">Өтүүчү жери</div>
+        <div style="font-weight:600;margin:10px 0 4px;font-size:1.1rem;">"Ак-Кеме" рестораны</div>
+        <div style="color:#666;font-size:0.95rem;">Бишкек ш., Чүй пр. 120</div>
+      </div>
+
+      <div class="rsvp-box fade-in-sec">
+        <h3>Урматтуу конок, келериңизди ырастап коюуңузду суранабыз</h3>
+        <div class="rsvp-opt">ООБА, БАРАМ!</div>
+        <div class="rsvp-opt">ЖУБАЙЫМ МЕНЕН БАРАМ</div>
+        <div class="rsvp-opt">ӨКҮНҮЧТҮҮСҮ, КЕЛЕ АЛБАЙМ</div>
+      </div>
+
+      <div class="inv-section bg-img story-bottom" id="previewBottomBg" style="min-height:60vh;background-size:cover;background-position:center;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:28px;">
+        <div style="position:relative;z-index:2;text-align:center;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5);">
+          <div style="font-size:0.9rem;letter-spacing:2px;opacity:0.9;margin-bottom:8px;">ИШ-ЧАРАГА ЧЕЙИН:</div>
+          <div class="countdown" id="previewCountdown2" style="background:transparent;box-shadow:none;"></div>
+        </div>
+      </div>
+
+      <div class="inv-section story-block fade-in-sec" style="padding-bottom:160px;">
+        <div class="story-title">Урматтоо менен</div>
+        <div class="hosts-name" style="margin-top:12px;">ТОЙ ЭЭЛЕРИ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview bottom bar -->
+  <div class="bottom-bar" style="flex-wrap:wrap;gap:8px;align-items:center;background:#1a1a1a;border-top:1.5px solid #c9a66b;">
+    <button onclick="closePreview()" style="flex:0.7;background:#fff;color:#1a1a1a;border:1.5px solid #ddd;border-radius:25px;padding:12px;font-weight:600;font-size:0.85rem;cursor:pointer;">← Артка</button>
+    <button onclick="chooseThisTpl()" style="flex:2.3;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:25px;padding:14px;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 14px rgba(34,197,94,0.4);">✅ УШУЛ ШАБЛОНДУ ТАНДОО</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN 1-5: WIZARD ========== -->
+<div class="screen" id="screenWizard">
+  <div class="wizard-header">
+    <div class="back" onclick="wizardBack()">← Артка</div>
+    <h2 id="wizardTitle">Негизги маалымат</h2>
+    <div class="steps" id="stepsBar"></div>
+  </div>
+  <div class="wizard-body" id="wizardBody"></div>
+  <div class="wizard-footer">
+    <button class="btn-back" id="btnBack" onclick="wizardBack()">Артка</button>
+    <button class="btn-next" id="btnNext" onclick="wizardNext()">Кийинки</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN: INVITATION PREVIEW (реалдуу) ========== -->
+<div class="screen" id="screenInvite">
+  <div class="invite-page">
+    <div class="seal-screen env-navy" id="sealScreen">
+      <div class="seal-inner">
+        <div class="seal-invite-label">СИЗ ЧАКЫРЫЛДЫҢЫЗ</div>
+        <div class="seal-script" id="sealScript">Тойго</div>
+        <div style="font-family:'Playfair Display',serif;font-size:0.95rem;letter-spacing:2px;opacity:0.85;margin-bottom:4px;" id="sealTitle">ҮЙЛӨНҮҮ ТОЮНА ЧАКЫРУУ</div>
+        <div class="seal" onclick="openSeal()">БАССЫЗ</div>
+        <div class="seal-hint">Басыңыз — музыка + живой эффект ✨</div>
+        <div class="seal-crest" id="sealCrest">
+          <svg viewBox="0 0 100 110" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M50 8 L88 28 L88 70 Q88 95 50 105 Q12 95 12 70 L12 28 Z" opacity="0.9"/>
+            <path d="M50 18 L78 32 L78 68 Q78 88 50 96 Q22 88 22 68 L22 32 Z" opacity="0.5"/>
+            <text x="50" y="62" text-anchor="middle" fill="currentColor" stroke="none" font-family="Great Vibes, cursive" font-size="22" id="crestLetters">&</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="invite-content" id="inviteContent">
+      <div class="inv-section bg-img story-hero" id="heroBg" style="background-image:url('https://images.unsplash.com/photo-1519741497674-611481863552?w=800');min-height:78vh;">
+        <div class="wedding-day" id="heroOverlay">WEDDING DAY</div>
+        <div class="names" id="invNames">Аты<br><span class="amp">&</span>Аты</div>
+      </div>
+
+      <div class="inv-section story-block fade-in-sec">
+        <div class="story-title" id="invGreeting">Урматтуу коноктор!</div>
+        <div class="inv-text" id="invText"></div>
+      </div>
+
+      <div class="inv-section bg-img story-mid" id="midBg" style="display:none;min-height:55vh;background-size:cover;background-position:center;"></div>
+
+      <div class="inv-section story-block fade-in-sec">
+        <div class="story-title">Той күнү</div>
+        <div class="date-card" style="margin-top:8px;">
+          <div class="label" id="invMonthLabel">Сентябрь</div>
+          <div class="big" id="invDate">2 Октябрь 2026</div>
+          <div style="font-size:1.15rem;font-weight:600;margin-top:6px;" id="invTime">саат 14:00</div>
+          <div class="day-badge" id="invDay">Жума</div>
+        </div>
+        <div class="countdown" id="countdown" style="margin-top:18px;"></div>
+      </div>
+
+      <div class="inv-section story-block fade-in-sec">
+        <div class="story-title">Өтүүчү жери</div>
+        <div style="font-weight:600;margin:10px 0 4px;font-size:1.1rem;" id="invPlace">—</div>
+        <div style="color:#666;font-size:0.95rem;" id="invAddress">Бишкек</div>
+        <a id="invMap" href="#" target="_blank" style="display:inline-block;margin-top:14px;background:#5c4a2e;color:#f5e6c8;padding:12px 26px;border-radius:28px;text-decoration:none;font-size:0.9rem;">КАРТАНЫ АЧУУ ↗</a>
+      </div>
+
+      <div class="rsvp-box fade-in-sec">
+        <h3>Урматтуу конок, келериңизди ырастап коюуңузду суранабыз</h3>
+        <div class="rsvp-opt" onclick="selectRsvp(this)">ООБА, БАРАМ!</div>
+        <div class="rsvp-opt" onclick="selectRsvp(this)">ЖУБАЙЫМ МЕНЕН БАРАМ</div>
+        <div class="rsvp-opt" onclick="selectRsvp(this)">ӨКҮНҮЧТҮҮСҮ, КЕЛЕ АЛБАЙМ</div>
+        <button class="btn-rsvp" onclick="submitRsvp()">ЖООП БЕРҮҮ</button>
+      </div>
+
+      <div class="inv-section bg-img story-bottom" id="bottomBg" style="min-height:60vh;background-size:cover;background-position:center;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:28px;">
+        <div style="position:relative;z-index:2;text-align:center;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5);">
+          <div style="font-size:0.9rem;letter-spacing:2px;opacity:0.9;margin-bottom:8px;">ИШ-ЧАРАГА ЧЕЙИН:</div>
+          <div class="countdown" id="countdown2" style="background:transparent;box-shadow:none;"></div>
+        </div>
+      </div>
+
+      <div class="inv-section story-block fade-in-sec" style="padding-bottom:110px;">
+        <div class="story-title">Урматтоо менен</div>
+        <div class="hosts-name" id="invHosts" style="margin-top:12px;">ТОЙ ЭЭЛЕРИ</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="invitePriceBar" style="display:none;position:fixed;bottom:72px;left:0;right:0;z-index:90;padding:10px 14px;background:linear-gradient(135deg,#fff8e1,#fff3e0);border-top:1.5px solid #e0c080;text-align:center;">
+    <div style="font-size:0.8rem;color:#888;">Чакыруу баасы</div>
+    <div style="font-size:1.4rem;font-weight:700;color:var(--pink);" id="invitePriceAmount">— сом</div>
+    <div style="font-size:0.9rem;margin-top:2px;">MBank: <b id="invitePriceMbank">+996 556 652 652</b>
+      <button type="button" onclick="copyMbank()" style="margin-left:6px;padding:4px 10px;border-radius:12px;border:1px solid #ddd;background:#fff;font-size:0.75rem;cursor:pointer;">Көчүрүү</button>
+    </div>
+  </div>
+  <div class="bottom-bar" style="flex-wrap:wrap;gap:8px;align-items:center;">
+    <button id="musicBtn" onclick="toggleMusic()" style="flex:0.4;background:#fff;border:1.5px solid #ddd;border-radius:25px;font-size:1.1rem;display:none;">🎵</button>
+    <select id="fontSwitcher" onchange="changeInviteFont(this.value)" style="flex:1.2;padding:11px 10px;border-radius:25px;border:1.5px solid #c9a66b;background:#fffaf0;font-size:0.75rem;color:#5c3a0a;font-weight:500;min-width:140px;">
+      <option value="'Noto Sans', sans-serif">★ Noto Sans (ҮӨҢ)</option>
+      <option value="'Montserrat', sans-serif">★ Montserrat</option>
+      <option value="'Inter', sans-serif">Inter</option>
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Open Sans', sans-serif">Open Sans</option>
+      <option value="'Poppins', sans-serif">Poppins</option>
+      <option value="'Raleway', sans-serif">Raleway</option>
+      <option value="'Nunito', sans-serif">Nunito</option>
+      <option value="'PT Sans', sans-serif">PT Sans</option>
+      <option value="'Source Sans 3', sans-serif">Source Sans</option>
+      <option value="'Lora', serif">★ Lora</option>
+      <option value="'Cormorant Garamond', serif">★ Cormorant</option>
+      <option value="'Playfair Display', serif">★ Playfair</option>
+      <option value="'Noto Serif', serif">Noto Serif</option>
+      <option value="'EB Garamond', serif">EB Garamond</option>
+      <option value="'Merriweather', serif">Merriweather</option>
+    </select>
+    <button class="btn-share" style="flex:1;background:#25D366;" onclick="shareWhatsApp()">WhatsApp</button>
+    <button class="btn-share" style="flex:1;" onclick="shareInvite()">Шилтеме</button>
+    <button class="btn-buy" style="flex:1;" onclick="showPayment()">Сатып алуу</button>
+  </div>
+</div>
+
+<!-- ========== ADMIN MODAL ========== -->
+<div class="modal-bg" id="adminModal" onclick="if(event.target===this)closeAdmin()">
+  <div class="modal">
+    <h3 id="adminTitle">🔑 Админ кирүү</h3>
+    <div id="adminLogin">
+      <input type="password" id="adminPass" placeholder="Админ сырсөзү" onkeydown="if(event.key==='Enter')loginAdmin()">
+      <button class="btn-full" onclick="loginAdmin()">Кирүү</button>
+      <button class="btn-outline" onclick="closeAdmin()">Жабуу</button>
+    </div>
+    <div id="adminPanel" style="display:none;">
+      <div style="background:#f5f5f5;border-radius:12px;padding:12px;margin-bottom:14px;text-align:center;font-size:0.9rem;">
+        MBank: <b id="mbankShow">+996 556 652 652</b>
+      </div>
+      <button class="btn-outline" onclick="editField('mbank')">✏️ MBank өзгөртүү</button>
+      <button class="btn-outline" onclick="editField('pass')">🔒 Сырсөз өзгөртүү</button>
+      <button class="btn-full" style="background:#7c4dff;" onclick="startWizard(true)">👑 Бекер чакыруу түзүү</button>
+      <button class="btn-full" style="background:#00897b;margin-top:8px;" onclick="openConverter()">🛠️ Конвертер (JSON/WEBP/Zoom/GIF)</button>
+      <button class="btn-full" style="background:#e65100;margin-top:8px;" onclick="openMp3Uploader()">🎵 MP3 музыка жүктөө</button>
+      <hr style="margin:16px 0;border:none;border-top:1px solid #eee;">
+      <h4 style="margin-bottom:10px;">Шаблондор</h4>
+      <div id="adminTplList"></div>
+      <button class="btn-full" onclick="showAddTpl()">+ Жаңы шаблон</button>
+      <button class="btn-outline" style="color:#e53935;margin-top:16px;" onclick="logoutAdmin()">Админден чыгуу</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TEMPLATE -->
+<div class="modal-bg" id="addTplModal">
+  <div class="modal" style="max-height:92vh;">
+    <h3>+ Кооз шаблон түзүү</h3>
+    <p style="font-size:0.78rem;color:#888;text-align:center;margin:-6px 0 12px;">Пресетти тандаңыз → сүрөт/музыка жүктөңүз → сактаңыз</p>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">0. ДИЗАЙН ПРЕСЕТИ</div>
+      <div id="designPresets" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+    </div>
+
+    <div style="background:#f8f6f2;border-radius:12px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">1. НЕГИЗГИ</div>
+      <input id="newTplName" placeholder="Аталышы (мис: Алтын той)">
+      <input type="number" id="newTplPrice" value="0" placeholder="Кошумча бонус сом (0 = авто баа)">
+    </div>
+
+    <div style="background:#f0f7ff;border-radius:12px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">2. СҮРӨТ (фон)</div>
+      <input id="newTplBg" placeholder="Сүрөт URL (же файл төмөндө)">
+      <input type="file" id="newTplFile" accept="image/*">
+    </div>
+
+    <div style="background:#fff5f5;border-radius:12px;padding:12px;margin-bottom:10px;border:2px solid #ffcdd2;">
+      <div style="font-size:0.8rem;font-weight:600;color:#c62828;margin-bottom:8px;">🎵 3. МУЗЫКА (MP3 / AAC / M4A)</div>
+      <div class="mp3-upload-box" onclick="document.getElementById('newTplMusic').click()">
+        <div class="icon">🎵</div>
+        <div class="text">MP3 файлды тандоо</div>
+        <div class="subtext">Макс 8MB · MP3, AAC, M4A, OGG</div>
+      </div>
+      <input type="file" id="newTplMusic" accept="audio/mpeg,audio/mp3,audio/aac,audio/mp4,audio/ogg,audio/*" style="display:none;">
+      <div id="newTplMusicPreview"></div>
+      <label style="font-size:0.8rem;color:#666;margin-top:8px;display:block;">Же музыка URL:</label>
+      <input id="newTplMusicUrl" placeholder="https://...mp3">
+    </div>
+
+    <div style="background:#f5f0ff;border-radius:12px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">4. КОНВЕРТ + ЖИВОЙ ЭФФЕКТ</div>
+      <label style="font-size:0.8rem;color:#666;">Конверт</label>
+      <select id="newTplEnv" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;margin-bottom:8px;">
+        <option value="navy">Көк navy (люкс)</option>
+        <option value="classic">Классикалык kraft</option>
+        <option value="burgundy">Бордо</option>
+        <option value="blackgold">Кара + алтын</option>
+        <option value="rose">Роза</option>
+        <option value="emerald">Изумруд</option>
+        <option value="ivory">Ivory</option>
+        <option value="purple">Кызгылт көк</option>
+      </select>
+      <label style="font-size:0.8rem;color:#666;">Эффект</label>
+      <select id="newTplEffect" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;">
+        <option value="zoom">Zoom (Ken Burns) — сунушталат</option>
+        <option value="shine">Shine (жаркыроо)</option>
+        <option value="fade">Fade</option>
+        <option value="3d">3D</option>
+        <option value="none">Жок</option>
+      </select>
+    </div>
+
+    <div style="background:#fff8e1;border-radius:12px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:0.8rem;font-weight:600;color:#888;margin-bottom:8px;">5. ТЕКСТ ҮСТҮНӨ + ШРИФТ</div>
+      <label style="font-size:0.8rem;color:#666;">Аттардын шрифти</label>
+      <select id="newTplFont" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;margin-bottom:8px;">
+        <optgroup label="★ Кол жазма (популярные)">
+          <option value="Great Vibes">Great Vibes — Каллиграфия ★</option>
+          <option value="Pinyon Script">Pinyon Script — Кол жазма</option>
+          <option value="Dancing Script">Dancing Script — Бийчи</option>
+          <option value="Pacifico">Pacifico — Жумшак</option>
+          <option value="Satisfy">Satisfy — Эркин</option>
+          <option value="Allura">Allura — Назик</option>
+          <option value="Tangerine">Tangerine — Жука</option>
+          <option value="Alex Brush">Alex Brush — Элегант кол</option>
+          <option value="Sacramento">Sacramento — Жука каллиграфия</option>
+          <option value="Parisienne">Parisienne — Париж стили</option>
+        </optgroup>
+        <optgroup label="★ Классика (избранные)">
+          <option value="Playfair Display">Playfair Display — Классика ★</option>
+          <option value="Cormorant Garamond">Cormorant Garamond — Элегант ★</option>
+          <option value="EB Garamond">EB Garamond — Китеп стили</option>
+          <option value="Libre Baskerville">Libre Baskerville — Классика</option>
+          <option value="Crimson Text">Crimson Text — Жука сериф</option>
+          <option value="Lora">Lora — Жумшак сериф</option>
+          <option value="Merriweather">Merriweather — Окууга ыңгайлуу</option>
+          <option value="Noto Serif">Noto Serif — Кыргызга ылайык ★</option>
+        </optgroup>
+        <optgroup label="★ Заманбап (Ү Ң Ө жакшы)">
+          <option value="Noto Sans">Noto Sans — Кыргыз тамгаларына эң жакшы ★</option>
+          <option value="Montserrat">Montserrat — Заманбап ★</option>
+          <option value="Inter">Inter — Таза</option>
+          <option value="Roboto">Roboto — Универсал</option>
+          <option value="Open Sans">Open Sans — Жумушчу</option>
+          <option value="Poppins">Poppins — Геометриялык</option>
+          <option value="Raleway">Raleway — Жука заманбап</option>
+          <option value="Nunito">Nunito — Жумшак круг</option>
+          <option value="Source Sans 3">Source Sans 3 — Таза окуу</option>
+          <option value="PT Sans">PT Sans — Орус + Кыргыз</option>
+        </optgroup>
+      </select>
+      <label style="font-size:0.8rem;color:#666;">Текст түсү</label>
+      <select id="newTplTextColor" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;margin-bottom:8px;">
+        <option value="#ffffff">Ак / Белый</option>
+        <option value="#f5e6c8">Крем · алтын / Крем · золото</option>
+        <option value="#d4af37">Алтын / Золото</option>
+        <option value="#5c3a0a">Коңур / Коричневый</option>
+        <option value="#1a1a1a">Кара / Чёрный</option>
+        <option value="#c76b8a">Роза / Розовый</option>
+        <option value="#e8f5e9">Жашыл ак / Светло-зелёный</option>
+        <option value="#e8d5ff">Кызгылт көк / Сиреневый</option>
+      </select>
+      <label style="font-size:0.8rem;color:#666;">Аттардын өлчөмү</label>
+      <select id="newTplFontSize" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;margin-bottom:8px;">
+        <option value="2.2rem">Орто / Средний</option>
+        <option value="2.8rem">Чоң / Большой</option>
+        <option value="1.6rem">Кичине / Маленький</option>
+        <option value="3.2rem">Абдан чоң / Очень большой</option>
+        <option value="1.3rem">Абдан кичине / Очень маленький</option>
+      </select>
+      <label style="font-size:0.8rem;color:#666;">Үстүнкү кооз текст</label>
+      <input id="newTplOverlay" placeholder="мис: Сүйүү · Той · 2026">
+    </div>
+
+    <button class="btn-full" onclick="saveTpl()">💾 Шаблонду сактоо</button>
+    <button class="btn-outline" onclick="closeAddTpl()">Жабуу</button>
+  </div>
+</div>
+
+<!-- MP3 UPLOADER MODAL -->
+<div class="modal-bg" id="mp3Modal" onclick="if(event.target===this)closeMp3Uploader()">
+  <div class="modal">
+    <h3>🎵 MP3 музыка жүктөө</h3>
+    <p style="font-size:0.85rem;color:#888;text-align:center;margin-bottom:16px;">Бардык шаблондор үчүн музыка</p>
+    <div class="mp3-upload-box" onclick="document.getElementById('mp3GlobalFile').click()">
+      <div class="icon">🎵</div>
+      <div class="text">MP3 файлды тандоо</div>
+      <div class="subtext">Макс 8MB · MP3, AAC, M4A, OGG</div>
+    </div>
+    <input type="file" id="mp3GlobalFile" accept="audio/mpeg,audio/mp3,audio/aac,audio/mp4,audio/ogg,audio/*" style="display:none;">
+    <div id="mp3GlobalPreview"></div>
+    <label style="font-size:0.85rem;color:#666;margin-top:12px;display:block;">Же музыка URL:</label>
+    <input id="mp3GlobalUrl" placeholder="https://...mp3">
+    <button class="btn-full" onclick="applyGlobalMp3()">✅ Бардык шаблондорго колдонуу</button>
+    <button class="btn-outline" onclick="closeMp3Uploader()">Жабуу</button>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div class="modal-bg" id="payModal">
+  <div class="modal">
+    <h3>Төлөм</h3>
+    <div class="price-box">
+      <div style="font-size:0.85rem;color:#888;">Чакыруу баасы</div>
+      <div class="amount" id="payAmount">— сом</div>
+    </div>
+    <p style="text-align:center;font-size:0.9rem;margin-bottom:12px;">
+      MBank номерине которуңуз:<br>
+      <b id="payMbank" style="font-size:1.2rem;">+996 556 652 652</b>
+    </p>
+    <button class="btn-full" onclick="copyMbank()">Номерди көчүрүү</button>
+    <button class="btn-outline" onclick="closePay()">Жабуу</button>
+  </div>
+</div>
+
+<!-- CONVERTER MODAL -->
+<div class="modal-bg" id="converterModal" onclick="if(event.target===this)closeConverter()">
+  <div class="modal" style="max-width:420px;">
+    <h3>🛠️ Конвертер</h3>
+    <p style="font-size:0.82rem;color:#888;text-align:center;margin-bottom:14px;">
+      Сүрөт / видео / аудио файл жүктөп, эффект кошуп, JSON же WEBP кылып алыңыз
+    </p>
+
+    <label style="font-size:0.85rem;color:#666;">Файл жүктөө (сүрөт / GIF / MP4 / MP3)</label>
+    <input type="file" id="convFile" accept="image/*,video/*,audio/*,.json" style="margin-bottom:12px;">
+
+    <div id="convPreview" style="text-align:center;margin:12px 0;min-height:80px;background:#f5f5f5;border-radius:12px;padding:10px;display:none;"></div>
+
+    <label style="font-size:0.85rem;color:#666;">Эффект</label>
+    <select id="convEffect" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;margin-bottom:12px;">
+      <option value="none">Жок</option>
+      <option value="zoom">Zoom +5 (Ken Burns)</option>
+      <option value="shine">Animated Shine</option>
+      <option value="3d">3D Perspective</option>
+      <option value="fade">Fade In/Out</option>
+    </select>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <button class="btn-full" style="background:#1565c0;margin:0;" onclick="convertTo('webp')">→ WEBP</button>
+      <button class="btn-full" style="background:#2e7d32;margin:0;" onclick="convertTo('jpeg')">→ JPEG</button>
+      <button class="btn-full" style="background:#6a1b9a;margin:0;" onclick="convertTo('json')">→ JSON</button>
+      <button class="btn-full" style="background:#e65100;margin:0;" onclick="applyEffect()">Эффект көрүү</button>
+    </div>
+
+    <button class="btn-outline" onclick="exportInviteJSON()">Чакырууну JSON кылып жүктөө</button>
+    <button class="btn-outline" onclick="closeConverter()">Жабуу</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== FIREBASE CONFIG ==================
+   ★★★ МААНИЛҮҮ ★★★
+   Төмөнкү жерди ӨЗ Firebase долбооруңуздун конфигине алмаштырыңыз.
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  authDomain: "YOUR-PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR-PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR-PROJECT",
+  storageBucket: "YOUR-PROJECT.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef123456"
+};
+
+let db = null;
+let firebaseReady = false;
+
+try {
+  if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('XXXX')) {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    firebaseReady = true;
+  }
+} catch (e) {
+  console.warn('Firebase init error', e);
+}
+
+/* ================== DATA ================== */
+const EVENT_TYPES = [
+  "Үйлөнүү той","Кыз узатуу","Жентек той","Туулган күн","Сүннөт той",
+  "Юбилей","Үй той","Тушоо той","Корпоратив","Жаңы жыл","Шерине",
+  "Ифтар","Ооз ачар","Куран окутуу","Эскерүү кечеси","Куда түшүү",
+  "Кудалык","Бешик той","Ажы той","Жолугушуу"
+];
+
+const DEFAULT_MUSIC = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+const DEFAULT_TEMPLATES = [
+  {
+    name:'Классикалык', price:0, effect:'zoom', envelope:'navy',
+    music: DEFAULT_MUSIC, musicName: 'Классика',
+    bg:'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+    images: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+      'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800',
+      'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800'
+    ]
+  },
+  {
+    name:'Романтика', price:0, effect:'shine', envelope:'rose',
+    music: DEFAULT_MUSIC, musicName: 'Романтика',
+    bg:'https://images.unsplash.com/photo-1515934756700-f2a2e4c8a6f4?w=800',
+    images: [
+      'https://images.unsplash.com/photo-1515934756700-f2a2e4c8a6f4?w=800',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800',
+      'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800'
+    ]
+  },
+  {
+    name:'Люкс', price:0, effect:'3d', envelope:'blackgold',
+    music: DEFAULT_MUSIC, musicName: 'Люкс',
+    bg:'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800',
+    images: [
+      'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800',
+      'https://images.unsplash.com/photo-1529636798458-92182e662485?w=800'
+    ]
+  }
+];
+
+let templates = [];
+let adminPass = localStorage.getItem('ch_pass') || 'admin123';
+let mbank = localStorage.getItem('ch_mbank') || '+996 556 652 652';
+let isAdmin = false;
+let freeMode = false;
+
+let currentStep = 0;
+const totalSteps = 5;
+let form = {
+  eventType: 'Үйлөнүү той',
+  title: 'Үйлөнүү тоюна чакыруу',
+  groom: '',
+  bride: '',
+  date: '2026-10-02',
+  time: '14:00',
+  times: ['14:00'],
+  city: 'Бишкек',
+  address: '',
+  place: '',
+  map: '',
+  text: 'Урматтуу бир туугандар, куда-кудагыйлар, достор, классташтар, кесиптештер, кошуналар жана дагы сыйлуу коноктор!\n\nСиз(дер)ди уулубуз менен келинибиздин үйлөнүү тоюна арналган салтанаттуу дасторконубузга кадырлуу конок болууга чакырабыз.',
+  hosts: '',
+  tplId: null,
+  music: '',
+  musicName: '',
+  customPhoto: '',
+  effect: 'zoom',
+  envelope: 'navy'
+};
+let bgAudio = null;
+let autoScrollTimer = null;
+
+/* ================== PREVIEW STATE ================== */
+let previewTplId = null;
+let previewAudio = null;
+let previewScrollTimer = null;
+let previewCountdownInterval = null;
+
+function setStatus(text, ok) {
+  const el = document.getElementById('onlineStatus');
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'online-status ' + (ok === true ? 'ok' : ok === false ? 'err' : '');
+}
+
+/* ================== INIT ================== */
+function init() {
+  document.getElementById('mbankShow').textContent = mbank;
+  document.getElementById('payMbank').textContent = mbank;
+  loadTemplates();
+  setupMp3Uploader();
+  setTimeout(tryLoadInviteFromUrl, 600);
+}
+
+/* ===== IndexedDB backup ===== */
+var _idb = null;
+function idbOpen() {
+  return new Promise(function(resolve, reject) {
+    if (_idb) return resolve(_idb);
+    if (!window.indexedDB) return reject('no idb');
+    var req = indexedDB.open('chakyruu_db', 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+    };
+    req.onsuccess = function(e) { _idb = e.target.result; resolve(_idb); };
+    req.onerror = function() { reject(req.error); };
+  });
+}
+function idbSet(key, value) {
+  return idbOpen().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction('kv', 'readwrite');
+      tx.objectStore('kv').put(value, key);
+      tx.oncomplete = function() { resolve(true); };
+      tx.onerror = function() { reject(tx.error); };
+    });
+  }).catch(function() { return false; });
+}
+function idbGet(key) {
+  return idbOpen().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction('kv', 'readonly');
+      var req = tx.objectStore('kv').get(key);
+      req.onsuccess = function() { resolve(req.result); };
+      req.onerror = function() { reject(req.error); };
+    });
+  }).catch(function() { return null; });
+}
+
+function loadTemplates() {
+  if (firebaseReady && db) {
+    setStatus('● онлайн...', true);
+    db.ref('templates').on('value', function(snap) {
+      const data = snap.val();
+      if (data) {
+        templates = Object.keys(data).map(function(k) {
+          return Object.assign({ id: k }, data[k]);
+        });
+      } else {
+        DEFAULT_TEMPLATES.forEach(function(t) {
+          db.ref('templates').push(t);
+        });
+        templates = DEFAULT_TEMPLATES.map(function(t, i) {
+          return Object.assign({ id: 'local' + i }, t);
+        });
+      }
+      if (templates.length && !form.tplId) form.tplId = templates[0].id;
+      renderTemplates();
+      renderAdminTpls();
+      setStatus('● онлайн', true);
+    }, function(err) {
+      console.error(err);
+      setStatus('● ката', false);
+      loadLocalFallback();
+    });
+  } else {
+    setStatus('● оффлайн', false);
+    loadLocalFallback();
+  }
+}
+
+function loadLocalFallback() {
+  var loaded = null;
+  try {
+    var raw = localStorage.getItem('ch_templates');
+    if (raw) loaded = JSON.parse(raw);
+  } catch (e) {
+    console.warn('localStorage parse error', e);
+  }
+
+  function applyLoaded(list) {
+    if (list && Array.isArray(list) && list.length > 0) {
+      templates = list;
+    } else {
+      templates = DEFAULT_TEMPLATES.map(function(t, i) {
+        return Object.assign({ id: 'def' + (i + 1) }, t);
+      });
+      try { localStorage.setItem('ch_templates', JSON.stringify(templates)); } catch (e) {}
+      try { idbSet('ch_templates', templates); } catch (e) {}
+    }
+    templates = templates.map(function(t) {
+      if (t.price === 790 || t.price === 990 || t.price === 1490) t.price = 0;
+      if (!t.id) t.id = 't' + Date.now() + Math.random().toString(36).slice(2, 7);
+      return t;
+    });
+    if (templates.length && !form.tplId) form.tplId = String(templates[0].id);
+    renderTemplates();
+    if (typeof renderAdminTpls === 'function') renderAdminTpls();
+    console.log('Шаблондор жүктөлдү:', templates.length);
+  }
+
+  if (loaded && Array.isArray(loaded) && loaded.length > 0) {
+    applyLoaded(loaded);
+  } else {
+    idbGet('ch_templates').then(function(fromIdb) {
+      applyLoaded(fromIdb);
+    }).catch(function() {
+      applyLoaded(null);
+    });
+  }
+}
+
+function saveTemplates() {
+  try {
+    var data = JSON.stringify(templates);
+    localStorage.setItem('ch_templates', data);
+    try { idbSet('ch_templates', templates); } catch (e) {}
+    return true;
+  } catch (e) {
+    console.error('saveTemplates error', e);
+    try {
+      var slim = templates.map(function(t) {
+        var copy = Object.assign({}, t);
+        if (copy.bg && copy.bg.length > 50000 && copy.bg.indexOf('data:') === 0) {
+          copy.bg = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600';
+          copy._bgStripped = true;
+        }
+        if (copy.music && copy.music.length > 50000) {
+          delete copy.music;
+          copy._musicStripped = true;
+        }
+        return copy;
+      });
+      localStorage.setItem('ch_templates', JSON.stringify(slim));
+      templates = slim;
+      try { idbSet('ch_templates', slim); } catch (e3) {}
+      toast('Сүрөт өтө чоң — кыскартылып сакталды');
+      return true;
+    } catch (e2) {
+      try {
+        idbSet('ch_templates', templates);
+        return true;
+      } catch (e4) {
+        toast('❌ Сактоо катасы: жергиликтүү сактагыч толук');
+        return false;
+      }
+    }
+  }
+}
+
+/* ================== DYNAMIC PRICE ================== */
+function calcPrice() {
+  if (freeMode) {
+    return { total: 0, level: 'Бекер (админ)', items: [{ name: 'Админ бекер', sum: 0 }] };
+  }
+  const items = [];
+  let total = 0;
+
+  items.push({ name: 'Негизги чакыруу', sum: 300 });
+  total += 300;
+
+  const premiumEvents = ['Үйлөнүү той', 'Кыз узатуу', 'Куда түшүү', 'Кудалык'];
+  if (premiumEvents.indexOf(form.eventType) >= 0) {
+    items.push({ name: 'Той түрү (салтанаттуу)', sum: 100 });
+    total += 100;
+  }
+
+  if (form.groom && form.bride) {
+    items.push({ name: 'Эки ат / жуп', sum: 50 });
+    total += 50;
+  }
+
+  const timesCount = (form.times && form.times.length) ? form.times.length : 1;
+  if (timesCount > 1) {
+    const add = (timesCount - 1) * 40;
+    items.push({ name: 'Кошумча убакыт ×' + (timesCount - 1), sum: add });
+    total += add;
+  }
+
+  if (form.place || form.address) {
+    items.push({ name: 'Дарек / ресторан', sum: 40 });
+    total += 40;
+  }
+
+  if (form.map) {
+    items.push({ name: '2GIS / Яндекс карта', sum: 50 });
+    total += 50;
+  }
+
+  if (form.text && form.text.length > 120) {
+    items.push({ name: 'Толук чакыруу тексти', sum: 40 });
+    total += 40;
+  }
+
+  if (form.hosts) {
+    items.push({ name: 'Той ээлери', sum: 30 });
+    total += 30;
+  }
+
+  if (form.customPhoto) {
+    items.push({ name: 'Жеке сүрөт', sum: 150 });
+    total += 150;
+  }
+
+  if (form.music) {
+    items.push({ name: 'Фондук музыка', sum: 120 });
+    total += 120;
+  }
+
+  const envPrice = {
+    navy: 150, blackgold: 150, burgundy: 120, emerald: 120, purple: 120,
+    rose: 80, classic: 50, ivory: 50
+  };
+  const env = form.envelope || 'navy';
+  const ep = envPrice[env] != null ? envPrice[env] : 80;
+  items.push({ name: 'Конверт: ' + env, sum: ep });
+  total += ep;
+
+  const fxPrice = { zoom: 80, shine: 70, fade: 50, '3d': 100, none: 0 };
+  const fx = form.effect || 'zoom';
+  const fp = fxPrice[fx] != null ? fxPrice[fx] : 50;
+  if (fp > 0) {
+    items.push({ name: 'Эффект: ' + fx, sum: fp });
+    total += fp;
+  }
+
+  const tpl = templates.find(t => String(t.id) === String(form.tplId));
+  if (tpl && tpl.price && Number(tpl.price) > 0) {
+    const p = Number(tpl.price);
+    if (p !== 790 && p !== 990 && p !== 1490) {
+      const bonus = Math.min(Math.round(p * 0.25), 250);
+      items.push({ name: 'Шаблон бонусу', sum: bonus });
+      total += bonus;
+    }
+  }
+
+  let level = 'Эконом';
+  if (total >= 1200) level = 'Эң сонун';
+  else if (total >= 950) level = 'Люкс';
+  else if (total >= 700) level = 'Премиум';
+  else if (total >= 500) level = 'Стандарт';
+
+  return { total: total, level: level, items: items };
+}
+
+/* ================== EVENT LABELS ================== */
+function getNameLabels(type) {
+  const map = {
+    'Үйлөнүү той': { label1: 'Күйөөнүн аты', ph1: 'Күйөөнүн атын жазыңыз', label2: 'Келиндин аты', ph2: 'Келиндин атын жазыңыз' },
+    'Кыз узатуу': { label1: 'Кыздын аты', ph1: 'Кыздын атын жазыңыз', label2: 'Күйөө жигиттин аты', ph2: 'Күйөө жигиттин атын жазыңыз' },
+    'Жентек той': { label1: 'Баланын аты', ph1: 'Баланын атын жазыңыз', label2: '', ph2: '' },
+    'Туулган күн': { label1: 'Маарек ээсинин аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Сүннөт той': { label1: 'Баланын аты', ph1: 'Баланын атын жазыңыз', label2: '', ph2: '' },
+    'Юбилей': { label1: 'Маарек ээсинин аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Үй той': { label1: 'Үй ээсинин аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Тушоо той': { label1: 'Баланын аты', ph1: 'Баланын атын жазыңыз', label2: '', ph2: '' },
+    'Корпоратив': { label1: 'Компания / уюштуруучу', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Жаңы жыл': { label1: 'Уюштуруучу', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Ифтар': { label1: 'Уюштуруучу / үй ээси', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Ооз ачар': { label1: 'Уюштуруучу', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Куран окутуу': { label1: 'Уюштуруучу', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Эскерүү': { label1: 'Эскерилүүчүнүн аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Эскерүү кечеси': { label1: 'Эскерилүүчүнүн аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Куда түшүү': { label1: 'Кыздын аты', ph1: 'Кыздын атын жазыңыз', label2: 'Жигиттин аты', ph2: 'Жигиттин атын жазыңыз' },
+    'Кудалык': { label1: 'Кыздын аты', ph1: 'Кыздын атын жазыңыз', label2: 'Жигиттин аты', ph2: 'Жигиттин атын жазыңыз' },
+    'Бешик той': { label1: 'Баланын аты', ph1: 'Баланын атын жазыңыз', label2: '', ph2: '' },
+    'Ажы той': { label1: 'Ажынын аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Шерине': { label1: 'Уюштуруучу', ph1: 'Атын жазыңыз', label2: '', ph2: '' },
+    'Жолугушуу': { label1: 'Уюштуруучу', ph1: 'Атын жазыңыз', label2: '', ph2: '' }
+  };
+  return map[type] || { label1: 'Негизги адамдын аты', ph1: 'Атын жазыңыз', label2: '', ph2: '' };
+}
+function makeTitle(type) {
+  const titles = {
+    'Үйлөнүү той': 'Үйлөнүү тоюна чакыруу',
+    'Кыз узатуу': 'Кыз узатуу тоюна чакыруу',
+    'Жентек той': 'Жентек тоюна чакыруу',
+    'Туулган күн': 'Туулган күнгө чакыруу',
+    'Сүннөт той': 'Сүннөт тоюна чакыруу',
+    'Юбилей': 'Юбилейге чакыруу',
+    'Үй той': 'Үй тоюна чакыруу',
+    'Тушоо той': 'Тушоо тоюна чакыруу',
+    'Корпоратив': 'Корпоративке чакыруу',
+    'Жаңы жыл': 'Жаңы жыл кечесине чакыруу',
+    'Шерине': 'Шеринеге чакыруу',
+    'Ифтар': 'Ифтарга чакыруу',
+    'Ооз ачар': 'Ооз ачарга чакыруу',
+    'Куран окутуу': 'Куран окутууга чакыруу',
+    'Эскерүү': 'Эскерүү кечесине чакыруу',
+    'Эскерүү кечеси': 'Эскерүү кечесине чакыруу',
+    'Куда түшүү': 'Куда түшүүгө чакыруу',
+    'Кудалык': 'Кудалыкка чакыруу',
+    'Бешик той': 'Бешик тоюна чакыруу',
+    'Ажы той': 'Ажы тоюна чакыруу',
+    'Жолугушуу': 'Жолугушууга чакыруу'
+  };
+  return titles[type] || (type + 'га чакыруу');
+}
+
+/* ================== TEMPLATES ================== */
+var tplTabFilter = 'all';
+function filterTplTab(btn, tab) {
+  tplTabFilter = tab;
+  document.querySelectorAll('.tpl-tab').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  renderTemplates();
+}
+function renderTemplates() {
+  const grid = document.getElementById('tplGrid');
+  if (!grid) return;
+  if (!templates.length) {
+    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#999;padding:20px;">Шаблон жок. Админ панелден кошуңуз.</p>';
+    return;
+  }
+  var list = templates.slice();
+  if (tplTabFilter === 'vip') list = list.filter(function(t) { return (t.price||0) > 0 || (t.name||'').toLowerCase().indexOf('vip')>=0 || (t.name||'').toLowerCase().indexOf('люкс')>=0; });
+  if (tplTabFilter === 'custom') list = list.filter(function(t) { return String(t.id||'').indexOf('tpl_')===0 || String(t.id||'').indexOf('def')!==0; });
+  if (!list.length) list = templates.slice();
+
+  grid.innerHTML = list.map(function(t, i) {
+    var bg = (t.images && t.images[0]) || t.bg || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400';
+    var isNew = i < 2 ? '<span class="badge-new">NEW</span>' : '';
+    var price = (t.price && t.price > 0) ? (t.price + ' сом') : '990 сом';
+    return '<div class="tpl-card ' + (String(form.tplId)===String(t.id)?'selected':'') + '" onclick="selectTpl(\'' + t.id + '\')">' +
+      '<div class="phone-frame">' + isNew +
+        '<img src="' + bg + '" alt="" onerror="this.src=\'https://images.unsplash.com/photo-1519741497674-611481863552?w=400\'">' +
+      '</div>' +
+      '<div class="info">' +
+        '<b>Үлгү №' + (i+1) + '</b>' +
+        '<span>' + (t.name || 'Чакыруу') + '</span>' +
+        '<div class="price">' + price + '</div>' +
+        '<button type="button" class="btn-view" onclick="event.stopPropagation();selectTpl(\'' + t.id + '\')">👁️ ДЕМО КӨРҮҮ</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ================== PREVIEW (ДЕМО) ================== */
+function selectTpl(id) {
+  previewTplId = id;
+  openTemplatePreview(id);
+}
+
+function openTemplatePreview(id) {
+  const tpl = templates.find(function(t) { return String(t.id) === String(id); });
+  if (!tpl) return toast('Шаблон табылган жок');
+
+  // Демо аттар (эгер шаблондо жок болсо)
+  const demoGroom = 'Айбек';
+  const demoBride = 'Айгүл';
+
+  const demoText = 'Урматтуу бир туугандар, куда-кудагыйлар, достор, классташтар, кесиптештер, кошуналар жана дагы сыйлуу коноктор!\n\nСиз(дер)ди уулубуз менен келинибиздин үйлөнүү тоюна арналган салтанаттуу дасторконубузга кадырлуу конок болууга чакырабыз.';
+
+  const demoEffect = tpl.effect || 'zoom';
+  const demoEnvelope = tpl.envelope || 'navy';
+
+  // Конверт
+  const seal = document.getElementById('previewSealScreen');
+  seal.className = 'seal-screen env-' + demoEnvelope;
+  seal.style.display = 'flex';
+
+  // Аттар
+  document.getElementById('previewNames').innerHTML = demoGroom + '<br><span class="amp">&</span>' + demoBride;
+  document.getElementById('previewText').textContent = demoText;
+
+  // Аттардын шрифти
+  const namesEl = document.getElementById('previewNames');
+  const f = tpl.font || 'Great Vibes';
+  const scriptFonts = ['Great Vibes','Pinyon Script','Dancing Script','Pacifico','Satisfy','Allura','Tangerine','Alex Brush','Sacramento','Parisienne'];
+  const isScript = scriptFonts.indexOf(f) !== -1;
+  namesEl.style.fontFamily = "'" + f + "', " + (isScript ? 'cursive' : 'sans-serif');
+  namesEl.style.color = tpl.textColor || '#ffffff';
+  namesEl.style.fontSize = tpl.fontSize || '2.8rem';
+  namesEl.style.textShadow = '0 2px 12px rgba(0,0,0,0.45)';
+
+  // Overlay
+  const ov = document.getElementById('previewOverlay');
+  ov.textContent = tpl.overlay || 'WEDDING DAY';
+  if (tpl.textColor) ov.style.color = tpl.textColor;
+
+  // Crest тамгалар
+  const crest = document.getElementById('previewCrestLetters');
+  if (crest) crest.textContent = 'Д';
+
+  // Сүрөттөр
+  var imgs = [];
+  if (tpl.images && tpl.images.length) imgs = tpl.images.slice();
+  else if (tpl.bg) imgs = [tpl.bg];
+  if (!imgs.length) imgs = ['https://images.unsplash.com/photo-1519741497674-611481863552?w=800'];
+
+  document.getElementById('previewHeroBg').style.backgroundImage = "url('" + imgs[0] + "')";
+  var midEl = document.getElementById('previewMidBg');
+  if (imgs[1]) {
+    midEl.style.backgroundImage = "url('" + imgs[1] + "')";
+    midEl.style.display = 'block';
+  } else {
+    midEl.style.display = 'none';
+  }
+  document.getElementById('previewBottomBg').style.backgroundImage = "url('" + (imgs[2] || imgs[0]) + "')";
+
+  // Content жашыруу
+  const content = document.getElementById('previewContent');
+  content.classList.remove('show', 'auto-scroll');
+  content.scrollTop = 0;
+
+  // Countdown (30 күн кийин)
+  var demoTarget = new Date();
+  demoTarget.setDate(demoTarget.getDate() + 30);
+  startPreviewCountdown(demoTarget);
+
+  // Badge
+  const badge = document.getElementById('previewBadge');
+  if (badge) badge.classList.add('show');
+
+  // Экран
+  showScreen('screenPreview');
+  window.scrollTo(0, 0);
+}
+
+function openPreviewSeal() {
+  document.getElementById('previewSealScreen').style.display = 'none';
+  const content = document.getElementById('previewContent');
+  content.classList.add('show', 'auto-scroll');
+
+  const tpl = templates.find(function(t) { return String(t.id) === String(previewTplId); }) || {};
+  const fx = tpl.effect || 'zoom';
+
+  ['previewHeroBg', 'previewMidBg', 'previewBottomBg'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el || el.style.display === 'none') return;
+    el.classList.remove('bg-live', 'zoom', 'shine', 'fade', 'fx-3d');
+    el.classList.add('bg-live');
+    if (fx === '3d') el.classList.add('fx-3d');
+    else if (fx === 'shine') el.classList.add('shine');
+    else if (fx === 'fade') el.classList.add('fade');
+    else el.classList.add('zoom');
+  });
+
+  setTimeout(function() {
+    content.querySelectorAll('.fade-in-sec').forEach(function(sec, i) {
+      setTimeout(function() { sec.classList.add('visible'); }, i * 180);
+    });
+  }, 100);
+
+  // Музыка
+  if (tpl.music) {
+    try {
+      if (previewAudio) { try { previewAudio.pause(); } catch(e){} }
+      previewAudio = new Audio(tpl.music);
+      previewAudio.loop = true;
+      previewAudio.volume = 0.55;
+      previewAudio.play().catch(function() {
+        toast('🎵 Музыка үчүн экранды басыңыз');
+      });
+    } catch (e) { console.warn(e); }
+  }
+
+  startPreviewScroll(content);
+  toast('🎵 Демо ачылды — ылдый жылдырыңыз');
+}
+
+function startPreviewScroll(el) {
+  if (previewScrollTimer) clearInterval(previewScrollTimer);
+  el.scrollTop = 0;
+  var pos = 0;
+  setTimeout(function() {
+    var max = Math.max(0, el.scrollHeight - el.clientHeight);
+    if (max < 40) return;
+    previewScrollTimer = setInterval(function() {
+      if (Math.abs(el.scrollTop - pos) > 40) {
+        clearInterval(previewScrollTimer);
+        previewScrollTimer = null;
+        return;
+      }
+      pos += 1.0;
+      if (pos >= max) {
+        clearInterval(previewScrollTimer);
+        previewScrollTimer = null;
+        return;
+      }
+      el.scrollTop = pos;
+    }, 28);
+  }, 400);
+
+  el.addEventListener('touchstart', function stopOnce() {
+    if (previewScrollTimer) { clearInterval(previewScrollTimer); previewScrollTimer = null; }
+    el.removeEventListener('touchstart', stopOnce);
+  }, { once: true });
+}
+
+function startPreviewCountdown(target) {
+  if (previewCountdownInterval) clearInterval(previewCountdownInterval);
+  function tick() {
+    const now = new Date();
+    let diff = Math.max(0, target - now);
+    const days = Math.floor(diff / 86400000); diff %= 86400000;
+    const hours = Math.floor(diff / 3600000); diff %= 3600000;
+    const mins = Math.floor(diff / 60000); diff %= 60000;
+    const secs = Math.floor(diff / 1000);
+    const html = `
+      <div class="cd-item"><div class="num">${days}</div><div class="lbl">күн</div></div>
+      <div class="cd-item"><div class="num">${hours}</div><div class="lbl">саат</div></div>
+      <div class="cd-item"><div class="num">${mins}</div><div class="lbl">мүнөт</div></div>
+      <div class="cd-item"><div class="num">${secs}</div><div class="lbl">секунд</div></div>
+    `;
+    var c1 = document.getElementById('previewCountdown');
+    var c2 = document.getElementById('previewCountdown2');
+    if (c1) c1.innerHTML = html;
+    if (c2) c2.innerHTML = html;
+  }
+  tick();
+  previewCountdownInterval = setInterval(tick, 1000);
+}
+
+function closePreview() {
+  if (previewAudio) { try { previewAudio.pause(); } catch(e){} previewAudio = null; }
+  if (previewScrollTimer) { clearInterval(previewScrollTimer); previewScrollTimer = null; }
+  if (previewCountdownInterval) { clearInterval(previewCountdownInterval); previewCountdownInterval = null; }
+  const badge = document.getElementById('previewBadge');
+  if (badge) badge.classList.remove('show');
+  showScreen('screenHome');
+}
+
+function chooseThisTpl() {
+  if (previewAudio) { try { previewAudio.pause(); } catch(e){} previewAudio = null; }
+  if (previewScrollTimer) { clearInterval(previewScrollTimer); previewScrollTimer = null; }
+  if (previewCountdownInterval) { clearInterval(previewCountdownInterval); previewCountdownInterval = null; }
+  const badge = document.getElementById('previewBadge');
+  if (badge) badge.classList.remove('show');
+  if (!previewTplId) return toast('Шаблон тандалган жок');
+  form.tplId = previewTplId;
+  renderTemplates();
+  toast('✅ Шаблон тандалды! Эми маалыматтарды толтуруңуз.');
+  startWizard();
+}
+
+/* ================== WIZARD ================== */
+function startWizard(free=false) {
+  freeMode = free || isAdmin;
+  currentStep = 0;
+  showScreen('screenWizard');
+  renderStep();
+  closeAdmin();
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function renderStep() {
+  const titles = ['Негизги маалымат','Убакыты','Дареги','Чакыруу тексти','Текшерүү'];
+  document.getElementById('wizardTitle').textContent = titles[currentStep];
+
+  let bar = '';
+  for (let i=0;i<totalSteps;i++) {
+    if (i>0) bar += `<div class="step-line ${i<=currentStep?'done':''}"></div>`;
+    const cls = i<currentStep ? 'done' : (i===currentStep ? 'active' : '');
+    bar += `<div class="step-dot ${cls}">${i<currentStep?'✓':(i+1)}</div>`;
+  }
+  document.getElementById('stepsBar').innerHTML = bar;
+
+  const body = document.getElementById('wizardBody');
+  const btnNext = document.getElementById('btnNext');
+  btnNext.textContent = currentStep === totalSteps-1 ? 'Сайт түзүү' : 'Кийинки';
+
+  if (currentStep === 0) {
+    const labels = getNameLabels(form.eventType);
+    body.innerHTML = `
+      <div class="field">
+        <label>Той түрү</label>
+        <div class="chips" id="eventChips"></div>
+      </div>
+      <div class="field">
+        <label>Иш-чаранын аталышы <span>*</span></label>
+        <input id="fTitle" value="${form.title}">
+      </div>
+      <div class="field" id="field1">
+        <label>${labels.label1} <span>*</span></label>
+        <input id="fGroom" value="${form.groom}" placeholder="${labels.ph1}">
+      </div>
+      <div class="field" id="field2" style="${labels.label2 ? '' : 'display:none'}">
+        <label>${labels.label2 || ''} ${labels.label2 ? '<span>*</span>' : ''}</label>
+        <input id="fBride" value="${form.bride}" placeholder="${labels.ph2 || ''}">
+      </div>
+    `;
+    const chips = document.getElementById('eventChips');
+    EVENT_TYPES.forEach(t => {
+      const c = document.createElement('div');
+      c.className = 'chip' + (form.eventType===t?' active':'');
+      c.textContent = t;
+      c.onclick = () => {
+        form.eventType = t;
+        form.title = makeTitle(t);
+        document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+        c.classList.add('active');
+        document.getElementById('fTitle').value = form.title;
+        const lb = getNameLabels(t);
+        const f1 = document.querySelector('#field1 label');
+        const f2 = document.querySelector('#field2 label');
+        const i1 = document.getElementById('fGroom');
+        const i2 = document.getElementById('fBride');
+        const box2 = document.getElementById('field2');
+        if (f1) f1.innerHTML = lb.label1 + ' <span>*</span>';
+        if (i1) i1.placeholder = lb.ph1;
+        if (lb.label2) {
+          box2.style.display = '';
+          if (f2) f2.innerHTML = lb.label2 + ' <span>*</span>';
+          if (i2) i2.placeholder = lb.ph2;
+        } else {
+          box2.style.display = 'none';
+          if (i2) i2.value = '';
+        }
+      };
+      chips.appendChild(c);
+    });
+  }
+  else if (currentStep === 1) {
+    if (!form.times || !form.times.length) form.times = [form.time || '14:00'];
+    const timesHtml = form.times.map((tm, i) => `
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+        <input type="time" class="fTimeItem" value="${tm}" style="flex:1;">
+        ${form.times.length > 1 ? `<button type="button" onclick="removeTime(${i})" style="padding:10px 14px;border-radius:12px;border:1px solid #ddd;background:#fff;cursor:pointer;">✕</button>` : ''}
+      </div>
+    `).join('');
+    body.innerHTML = `
+      <div class="field">
+        <label>Иш-чаранын датасы <span>*</span></label>
+        <input type="date" id="fDate" value="${form.date}">
+      </div>
+      <div class="field">
+        <label>Иш-чаранын убактысы <span>*</span></label>
+        <div id="timesList">${timesHtml}</div>
+        <button type="button" onclick="addTime()" style="margin-top:6px;padding:10px 16px;border-radius:20px;border:1.5px dashed var(--pink);background:#fff;color:var(--pink);font-size:0.9rem;cursor:pointer;width:100%;">+ Убакыт кошуу</button>
+      </div>
+      <div class="hint">ℹ️ Бир нече убакыт кошсоңуз болот (мисалы: нике 12:00, той 18:00).</div>
+    `;
+  }
+  else if (currentStep === 2) {
+    body.innerHTML = `
+      <div class="field">
+        <label>Шаар <span>*</span></label>
+        <input id="fCity" value="${form.city}" placeholder="Шаарды киргизиңиз">
+      </div>
+      <div class="field">
+        <label>Дарек <span>*</span></label>
+        <input id="fAddress" value="${form.address}" placeholder="Даректи киргизиңиз">
+      </div>
+      <div class="field">
+        <label>Ресторан / жер</label>
+        <input id="fPlace" value="${form.place}" placeholder="Ресторандын аты">
+      </div>
+      <div class="field">
+        <label>2GIS / Яндекс шилтемеси (милдеттүү эмес)</label>
+        <input id="fMap" value="${form.map}" placeholder="https://2gis.kg/...">
+      </div>
+      <div class="hint">Колдоого алынат: 2GIS, Google Maps, Яндекс.Карты</div>
+    `;
+  }
+  else if (currentStep === 3) {
+    body.innerHTML = `
+      <div class="field">
+        <label>Чакыруу тексти</label>
+        <textarea id="fText">${form.text}</textarea>
+      </div>
+      <div class="field">
+        <label>Той ээлери (кыргызча)</label>
+        <input id="fHosts" value="${form.hosts}" placeholder="Урмат Анара">
+      </div>
+      <div class="field">
+        <label>🖼️ Өз сүрөтүңүз (файл)</label>
+        <input type="file" id="fPhoto" accept="image/*" style="padding:10px;">
+        <div style="font-size:0.8rem;color:#888;margin-top:6px;" id="photoLabel">${form.customPhoto ? 'Сүрөт тандалды' : 'JPEG, PNG, WEBP жүктөңүз'}</div>
+      </div>
+      <div class="field">
+        <label>🎵 Фондук музыка (MP3 / AAC / M4A)</label>
+        <div class="mp3-upload-box" onclick="document.getElementById('fMusic').click()">
+          <div class="icon">🎵</div>
+          <div class="text">MP3 файлды тандоо</div>
+          <div class="subtext">Макс 8MB · MP3, AAC, M4A, OGG</div>
+        </div>
+        <input type="file" id="fMusic" accept="audio/mpeg,audio/mp3,audio/aac,audio/mp4,audio/ogg,audio/*" style="display:none;">
+        <div id="musicPreview"></div>
+        <label style="font-size:0.8rem;color:#666;margin-top:8px;display:block;">Же музыканын URL дареги</label>
+        <input id="fMusicUrl" value="${form.music && !form.music.startsWith('data:') ? form.music : ''}" placeholder="https://...mp3">
+      </div>
+      <div class="field">
+        <label>✉️ Конверт түрү</label>
+        <select id="fEnvelope" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;">
+          <option value="navy" ${form.envelope==='navy'?'selected':''}>Көк navy (люкс)</option>
+          <option value="classic" ${form.envelope==='classic'?'selected':''}>Классикалык kraft</option>
+          <option value="burgundy" ${form.envelope==='burgundy'?'selected':''}>Бордо</option>
+          <option value="blackgold" ${form.envelope==='blackgold'?'selected':''}>Кара + алтын</option>
+          <option value="rose" ${form.envelope==='rose'?'selected':''}>Роза</option>
+          <option value="emerald" ${form.envelope==='emerald'?'selected':''}>Изумруд</option>
+          <option value="ivory" ${form.envelope==='ivory'?'selected':''}>Слоновая кость</option>
+          <option value="purple" ${form.envelope==='purple'?'selected':''}>Кызгылт көк</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>✨ Эффект (живой)</label>
+        <select id="fEffect" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #e0e0e0;">
+          <option value="zoom" ${form.effect==='zoom'?'selected':''}>Zoom (Ken Burns)</option>
+          <option value="shine" ${form.effect==='shine'?'selected':''}>Shine</option>
+          <option value="fade" ${form.effect==='fade'?'selected':''}>Fade</option>
+          <option value="3d" ${form.effect==='3d'?'selected':''}>3D</option>
+          <option value="none" ${form.effect==='none'?'selected':''}>Жок</option>
+        </select>
+      </div>
+    `;
+    const photoInput = document.getElementById('fPhoto');
+    if (photoInput) {
+      photoInput.onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        if (f.size > 5 * 1024 * 1024) { toast('Сүрөт өтө чоң (макс 5MB)'); return; }
+        const r = new FileReader();
+        r.onload = e => {
+          form.customPhoto = e.target.result;
+          document.getElementById('photoLabel').textContent = 'Сүрөт тандалды: ' + f.name;
+          toast('Сүрөт жүктөлдү');
+        };
+        r.readAsDataURL(f);
+      };
+    }
+    setupMp3Input('fMusic', 'musicPreview', function(dataUrl, fileName) {
+      form.music = dataUrl;
+      form.musicName = fileName;
+    });
+  }
+  else if (currentStep === 4) {
+    const envNames = {navy:'Navy люкс',classic:'Kraft',burgundy:'Бордо',blackgold:'Кара+алтын',rose:'Роза',emerald:'Изумруд',ivory:'Ivory',purple:'Кызгылт көк'};
+    const pricing = calcPrice();
+    const breakdown = pricing.items.map(function(it) {
+      return `<div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:3px 0;color:#666;">
+        <span>${it.name}</span><span>+${it.sum}</span></div>`;
+    }).join('');
+    body.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;border:1px solid #eee;">
+        <div style="font-weight:600;margin-bottom:8px;">${form.title}</div>
+        <div style="font-size:0.9rem;color:#555;white-space:pre-line;margin-bottom:12px;">${form.text}</div>
+        <div style="font-size:0.85rem;color:#888;">
+          ${form.bride ? form.groom + ' & ' + form.bride : form.groom}<br>
+          ${form.date} · ${(form.times||[form.time]).join(' · ')}<br>
+          ${form.city}${form.address ? ', '+form.address : ''}<br>
+          ✉️ ${envNames[form.envelope]||form.envelope||'Navy'} · ✨ ${form.effect||'zoom'}<br>
+          ${form.musicName ? '🎵 ' + form.musicName : '🎵 Музыка жок'}
+        </div>
+        <button class="btn-sm" style="margin-top:10px;" onclick="currentStep=0;renderStep()">✎ Түзөтүү</button>
+      </div>
+      <div class="price-box">
+        <div style="font-size:0.85rem;color:#888;">Сапат деңгээли: <b>${pricing.level}</b></div>
+        <div class="amount">${pricing.total} сом</div>
+        <div style="margin-top:10px;text-align:left;max-height:140px;overflow-y:auto;">${breakdown}</div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #e0c080;text-align:center;">
+          <div style="font-size:0.8rem;color:#888;">MBank номерине которуңуз</div>
+          <div style="font-size:1.25rem;font-weight:700;color:#333;margin-top:4px;">${mbank}</div>
+          <button type="button" class="btn-sm" style="margin-top:10px;" onclick="navigator.clipboard.writeText('${mbank.replace(/\s/g,'')}');toast('MBank көчүрүлдү')">Номерди көчүрүү</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function collectStep() {
+  if (currentStep === 0) {
+    form.title = document.getElementById('fTitle')?.value || form.title;
+    form.groom = document.getElementById('fGroom')?.value || '';
+    form.bride = document.getElementById('fBride')?.value || '';
+  } else if (currentStep === 1) {
+    form.date = document.getElementById('fDate')?.value || form.date;
+    const items = document.querySelectorAll('.fTimeItem');
+    form.times = [];
+    items.forEach(function(inp) { if (inp.value) form.times.push(inp.value); });
+    if (!form.times.length) form.times = ['14:00'];
+    form.time = form.times[0];
+  } else if (currentStep === 2) {
+    form.city = document.getElementById('fCity')?.value || '';
+    form.address = document.getElementById('fAddress')?.value || '';
+    form.place = document.getElementById('fPlace')?.value || '';
+    form.map = document.getElementById('fMap')?.value || '';
+  } else if (currentStep === 3) {
+    form.text = document.getElementById('fText')?.value || form.text;
+    form.hosts = document.getElementById('fHosts')?.value || '';
+    const url = document.getElementById('fMusicUrl')?.value?.trim();
+    if (url && !form.music) {
+      form.music = url;
+      form.musicName = url.split('/').pop() || 'URL музыка';
+    }
+    form.envelope = document.getElementById('fEnvelope')?.value || form.envelope || 'classic';
+    form.effect = document.getElementById('fEffect')?.value || form.effect || 'zoom';
+  }
+}
+
+function wizardNext() {
+  collectStep();
+  if (currentStep === 0) {
+    const lb = getNameLabels(form.eventType);
+    if (!form.groom) return toast(lb.ph1 || 'Атын жазыңыз');
+    if (lb.label2 && !form.bride) return toast(lb.ph2 || 'Экинчи атты жазыңыз');
+  }
+  if (currentStep < totalSteps - 1) {
+    currentStep++;
+    renderStep();
+  } else {
+    buildInvite();
+  }
+}
+function wizardBack() {
+  if (currentStep > 0) {
+    collectStep();
+    currentStep--;
+    renderStep();
+  } else {
+    showScreen('screenHome');
+  }
+}
+function addTime() {
+  collectStep();
+  form.times.push('18:00');
+  renderStep();
+}
+function removeTime(i) {
+  collectStep();
+  form.times.splice(i, 1);
+  if (!form.times.length) form.times = ['14:00'];
+  renderStep();
+}
+
+/* ================== BUILD INVITE ================== */
+function buildInvite() {
+  const tpl = templates.find(t => String(t.id) === String(form.tplId)) || templates[0];
+  const d = new Date(form.date + 'T12:00:00');
+  const days = ['Жекшемби','Дүйшөмбү','Шейшемби','Шаршемби','Бейшемби','Жума','Ишемби'];
+  const months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+  document.getElementById('sealTitle').textContent = form.title.toUpperCase();
+  const scriptEl = document.getElementById('sealScript');
+  if (scriptEl) {
+    const shortMap = {
+      'Үйлөнүү той': 'Тойго', 'Кыз узатуу': 'Кыз узатууга', 'Сүннөт той': 'Сүннөткө',
+      'Туулган күн': 'Туулган күнгө', 'Ифтар': 'Ифтарга', 'Юбилей': 'Юбилейге'
+    };
+    scriptEl.textContent = shortMap[form.eventType] || 'Майрамга';
+  }
+  const crest = document.getElementById('crestLetters');
+  if (crest) {
+    const a = (form.groom || '').trim().charAt(0);
+    const b = (form.bride || '').trim().charAt(0);
+    crest.textContent = (a && b) ? (a + ' & ' + b) : (a || '&');
+  }
+  if (form.bride) {
+    document.getElementById('invNames').innerHTML = `${form.groom || ''}<br><span class="amp">&</span>${form.bride}`;
+  } else {
+    document.getElementById('invNames').innerHTML = form.groom || '';
+  }
+  document.getElementById('invText').textContent = form.text;
+  document.getElementById('invDate').textContent = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  const timesStr = (form.times && form.times.length) ? form.times.map(t => 'саат ' + t).join(' · ') : ('саат ' + form.time);
+  document.getElementById('invTime').textContent = timesStr;
+  document.getElementById('invDay').textContent = days[d.getDay()];
+  document.getElementById('invPlace').textContent = form.place || form.address || '—';
+  document.getElementById('invAddress').textContent = form.city + (form.address && form.place ? ', ' + form.address : '');
+  document.getElementById('invHosts').textContent = (form.hosts || 'Той ээлери').toUpperCase();
+  var imgs = [];
+  if (tpl && tpl.images && tpl.images.length) imgs = tpl.images.slice();
+  else if (tpl && tpl.bg) imgs = [tpl.bg];
+  if (form.customPhoto) imgs[0] = form.customPhoto;
+  if (!imgs.length) imgs = ['https://images.unsplash.com/photo-1519741497674-611481863552?w=800'];
+
+  var heroEl = document.getElementById('heroBg');
+  if (heroEl) heroEl.style.backgroundImage = "url('" + imgs[0] + "')";
+
+  var midEl = document.getElementById('midBg');
+  if (midEl) {
+    if (imgs[1]) {
+      midEl.style.backgroundImage = "url('" + imgs[1] + "')";
+      midEl.style.display = 'block';
+    } else {
+      midEl.style.display = 'none';
+    }
+  }
+  var botEl = document.getElementById('bottomBg');
+  if (botEl) {
+    botEl.style.backgroundImage = "url('" + (imgs[2] || imgs[0]) + "')";
+  }
+
+  var monthEl = document.getElementById('invMonthLabel');
+  if (monthEl) monthEl.textContent = months[d.getMonth()].toUpperCase();
+
+  const namesEl = document.getElementById('invNames');
+  if (namesEl && tpl) {
+    const f = tpl.font || 'Great Vibes';
+    const scriptFonts = ['Great Vibes','Pinyon Script','Dancing Script','Pacifico','Satisfy','Allura','Tangerine','Alex Brush','Sacramento','Parisienne'];
+    const isScript = scriptFonts.indexOf(f) !== -1;
+    namesEl.style.fontFamily = "'" + f + "', " + (isScript ? 'cursive' : 'sans-serif');
+    namesEl.style.color = tpl.textColor || '#ffffff';
+    namesEl.style.fontSize = tpl.fontSize || '2.2rem';
+    namesEl.style.textShadow = '0 2px 12px rgba(0,0,0,0.45)';
+  }
+  const ov = document.getElementById('heroOverlay');
+  if (ov) {
+    ov.textContent = (tpl && tpl.overlay) ? tpl.overlay : 'WEDDING DAY';
+    if (tpl && tpl.textColor) ov.style.color = tpl.textColor;
+  }
+
+  const mapBtn = document.getElementById('invMap');
+  if (form.map) {
+    mapBtn.href = form.map;
+    mapBtn.style.display = 'inline-block';
+  } else {
+    mapBtn.style.display = 'none';
+  }
+
+  if (tpl) {
+    if (!form.effect || form.effect === 'none') form.effect = tpl.effect || 'zoom';
+    if (!form.envelope) form.envelope = tpl.envelope || 'navy';
+    if (!form.music && tpl.music) {
+      form.music = tpl.music;
+      form.musicName = tpl.musicName || 'Шаблон музыкасы';
+    }
+  }
+  if (!form.music && typeof DEFAULT_MUSIC !== 'undefined') {
+    form.music = DEFAULT_MUSIC;
+    form.musicName = form.musicName || 'Фон музыкасы';
+  }
+  if (!form.effect || form.effect === 'none') form.effect = 'zoom';
+
+  const seal = document.getElementById('sealScreen');
+  seal.className = 'seal-screen env-' + (form.envelope || 'navy');
+  seal.style.display = 'flex';
+  const invContent = document.getElementById('inviteContent');
+  invContent.classList.remove('show', 'auto-scroll');
+  invContent.scrollTop = 0;
+  if (autoScrollTimer) { clearInterval(autoScrollTimer); autoScrollTimer = null; }
+
+  if (bgAudio) { try { bgAudio.pause(); } catch(e){} bgAudio = null; }
+  const musicBtn = document.getElementById('musicBtn');
+  if (form.music) {
+    try {
+      bgAudio = new Audio(form.music);
+      bgAudio.loop = true;
+      bgAudio.volume = 0.55;
+      bgAudio.preload = 'auto';
+      if (musicBtn) musicBtn.style.display = 'block';
+    } catch (e) {
+      console.warn('Audio create error', e);
+      if (musicBtn) musicBtn.style.display = 'none';
+    }
+  } else {
+    if (musicBtn) musicBtn.style.display = 'none';
+  }
+
+  const pricing = calcPrice();
+  const priceBar = document.getElementById('invitePriceBar');
+  if (priceBar) {
+    priceBar.style.display = 'block';
+    document.getElementById('invitePriceAmount').textContent = pricing.total + ' сом · ' + pricing.level;
+    document.getElementById('invitePriceMbank').textContent = mbank;
+  }
+
+  startCountdown(d);
+  showScreen('screenInvite');
+  saveInviteLink();
+  toast('Чакыруу даяр! ' + pricing.level + ' — ' + pricing.total + ' сом');
+}
+
+function saveInviteLink() {
+  const payload = {
+    form: {
+      eventType: form.eventType,
+      title: form.title,
+      groom: form.groom,
+      bride: form.bride,
+      date: form.date,
+      time: form.time,
+      times: form.times,
+      city: form.city,
+      address: form.address,
+      place: form.place,
+      map: form.map,
+      text: form.text,
+      hosts: form.hosts,
+      tplId: form.tplId
+    },
+    createdAt: Date.now()
+  };
+  if (firebaseReady && db) {
+    const ref = db.ref('invites').push(payload);
+    ref.then(function() {
+      const id = ref.key;
+      const link = location.href.split('?')[0].split('#')[0] + '?invite=' + id;
+      form.shareLink = link;
+      toast('Шилтеме даяр');
+      setTimeout(function() {
+        if (confirm('Текшерүү шилтемеси:\n' + link + '\n\nКөчүрүлсүнбү?')) {
+          navigator.clipboard.writeText(link).then(function() { toast('Шилтеме көчүрүлдү'); });
+        }
+      }, 400);
+    }).catch(function() {
+      makeHashLink(payload);
+    });
+  } else {
+    makeHashLink(payload);
+  }
+}
+function makeHashLink(payload) {
+  try {
+    const enc = btoa(unescape(encodeURIComponent(JSON.stringify(payload.form))));
+    const link = location.href.split('?')[0].split('#')[0] + '#i=' + enc;
+    form.shareLink = link;
+    if (confirm('Оффлайн шилтеме (кыска маалымат):\n' + link.slice(0, 80) + '...\n\nКөчүрүлсүнбү?')) {
+      navigator.clipboard.writeText(link);
+      toast('Шилтеме көчүрүлдү');
+    }
+  } catch (e) {
+    toast('Шилтеме түзүлгөн жок');
+  }
+}
+function tryLoadInviteFromUrl() {
+  const q = new URLSearchParams(location.search).get('invite');
+  const hash = location.hash;
+  if (q && firebaseReady && db) {
+    db.ref('invites/' + q).once('value').then(function(snap) {
+      const data = snap.val();
+      if (data && data.form) {
+        Object.assign(form, data.form);
+        buildInvite();
+        toast('Чакыруу ачылды');
+      }
+    });
+  } else if (hash && hash.indexOf('#i=') === 0) {
+    try {
+      const raw = decodeURIComponent(escape(atob(hash.slice(3))));
+      const data = JSON.parse(raw);
+      Object.assign(form, data);
+      buildInvite();
+      toast('Чакыруу ачылды');
+    } catch (e) {}
+  }
+}
+
+function openSeal() {
+  document.getElementById('sealScreen').style.display = 'none';
+  const content = document.getElementById('inviteContent');
+  content.classList.add('show', 'auto-scroll');
+
+  ['heroBg', 'midBg', 'bottomBg'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el || el.style.display === 'none') return;
+    el.classList.remove('bg-live', 'zoom', 'shine', 'fade', 'fx-3d');
+    var fx = form.effect || 'zoom';
+    if (!fx || fx === 'none') fx = 'zoom';
+    el.classList.add('bg-live');
+    if (fx === '3d') el.classList.add('fx-3d');
+    else if (fx === 'shine') el.classList.add('shine');
+    else if (fx === 'fade') el.classList.add('fade');
+    else el.classList.add('zoom');
+  });
+
+  setTimeout(function() {
+    content.querySelectorAll('.fade-in-sec').forEach(function(sec, i) {
+      setTimeout(function() { sec.classList.add('visible'); }, i * 180);
+    });
+  }, 100);
+
+  playInviteMusic();
+  startAutoScroll(content);
+  toast('🎵 Чакыруу ачылды — скролл + музыка');
+}
+
+function playInviteMusic() {
+  if (!form.music && typeof DEFAULT_MUSIC !== 'undefined') {
+    form.music = DEFAULT_MUSIC;
+  }
+  if (!form.music) {
+    toast('Музыка жок — шаблонго музыка кошуңуз');
+    return;
+  }
+  try {
+    if (!bgAudio || (bgAudio.src !== form.music && !String(bgAudio.src||'').includes(form.music.slice(-20)))) {
+      if (bgAudio) { try { bgAudio.pause(); } catch(e){} }
+      bgAudio = new Audio(form.music);
+      bgAudio.loop = true;
+      bgAudio.volume = 0.55;
+    }
+    var btn = document.getElementById('musicBtn');
+    if (btn) btn.style.display = 'block';
+    var p = bgAudio.play();
+    if (p && p.then) {
+      p.then(function() {
+        if (btn) btn.textContent = '🔊';
+      }).catch(function() {
+        if (btn) btn.textContent = '🎵';
+        toast('Музыканы ойнотуу үчүн 🎵 басыңыз');
+      });
+    }
+  } catch (e) {
+    toast('Музыканы ойнотуу үчүн 🎵 басыңыз');
+  }
+}
+
+function startAutoScroll(el) {
+  if (autoScrollTimer) clearInterval(autoScrollTimer);
+  el.scrollTop = 0;
+  var pos = 0;
+  setTimeout(function() {
+    var max = Math.max(0, el.scrollHeight - el.clientHeight);
+    if (max < 40) return;
+    autoScrollTimer = setInterval(function() {
+      if (Math.abs(el.scrollTop - pos) > 40) {
+        clearInterval(autoScrollTimer);
+        autoScrollTimer = null;
+        return;
+      }
+      pos += 1.0;
+      if (pos >= max) {
+        clearInterval(autoScrollTimer);
+        autoScrollTimer = null;
+        return;
+      }
+      el.scrollTop = pos;
+    }, 28);
+  }, 400);
+
+  el.addEventListener('touchstart', function stopOnce() {
+    if (autoScrollTimer) { clearInterval(autoScrollTimer); autoScrollTimer = null; }
+    el.removeEventListener('touchstart', stopOnce);
+  }, { once: true });
+  el.addEventListener('wheel', function stopOnce2() {
+    if (autoScrollTimer) { clearInterval(autoScrollTimer); autoScrollTimer = null; }
+    el.removeEventListener('wheel', stopOnce2);
+  }, { once: true });
+}
+
+function toggleMusic() {
+  if (!bgAudio && form.music) {
+    playInviteMusic();
+    return;
+  }
+  if (!bgAudio) return toast('Музыка жок');
+  const btn = document.getElementById('musicBtn');
+  if (bgAudio.paused) {
+    bgAudio.play().then(function() {
+      if (btn) btn.textContent = '🔊';
+    }).catch(function() {
+      toast('Музыка ойнолбой жатат');
+    });
+  } else {
+    bgAudio.pause();
+    if (btn) btn.textContent = '🎵';
+  }
+}
+
+function startCountdown(target) {
+  const end = new Date(form.date + 'T' + form.time + ':00');
+  function tick() {
+    const now = new Date();
+    let diff = Math.max(0, end - now);
+    const days = Math.floor(diff / 86400000); diff %= 86400000;
+    const hours = Math.floor(diff / 3600000); diff %= 3600000;
+    const mins = Math.floor(diff / 60000); diff %= 60000;
+    const secs = Math.floor(diff / 1000);
+    const html = `
+      <div class="cd-item"><div class="num">${days}</div><div class="lbl">күн</div></div>
+      <div class="cd-item"><div class="num">${hours}</div><div class="lbl">саат</div></div>
+      <div class="cd-item"><div class="num">${mins}</div><div class="lbl">мүнөт</div></div>
+      <div class="cd-item"><div class="num">${secs}</div><div class="lbl">секунд</div></div>
+    `;
+    document.getElementById('countdown').innerHTML = html;
+    document.getElementById('countdown2').innerHTML = html;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ================== RSVP ================== */
+function selectRsvp(el) {
+  document.querySelectorAll('.rsvp-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function submitRsvp() {
+  const sel = document.querySelector('.rsvp-opt.selected');
+  if (!sel) return toast('Жоопту тандаңыз');
+  toast('Рахмат! Жообуңуз кабыл алынды');
+}
+
+/* ================== SHARE / PAY ================== */
+function shareInvite() {
+  const url = form.shareLink || location.href;
+  navigator.clipboard.writeText(url).then(function() {
+    toast('Шилтеме көчүрүлдү');
+  }).catch(function() {
+    prompt('Шилтемени көчүрүңүз:', url);
+  });
+}
+function shareWhatsApp() {
+  const url = form.shareLink || location.href;
+  const names = form.bride ? (form.groom + ' & ' + form.bride) : (form.groom || '');
+  const text = encodeURIComponent((form.title || 'Чакыруу') + '\n' + names + '\n' + url);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+function showPayment() {
+  const pricing = calcPrice();
+  document.getElementById('payAmount').textContent = pricing.total + ' сом (' + pricing.level + ')';
+  document.getElementById('payMbank').textContent = mbank;
+  document.getElementById('payModal').classList.add('show');
+  document.getElementById('payModal').style.display = 'flex';
+}
+function closePay() { document.getElementById('payModal').classList.remove('show'); }
+function copyMbank() {
+  navigator.clipboard.writeText(mbank.replace(/\s/g,''));
+  toast('MBank номер көчүрүлдү');
+}
+
+/* ================== MP3 UPLOADER ================== */
+function setupMp3Input(inputId, previewId, onLoad) {
+  var input = document.getElementById(inputId);
+  var preview = document.getElementById(previewId);
+  if (!input) return;
+  input.onchange = function() {
+    var f = this.files[0];
+    if (!f) return;
+    if (f.size > 8 * 1024 * 1024) { toast('Файл өтө чоң (макс 8MB)'); return; }
+    var r = new FileReader();
+    r.onload = function(e) {
+      if (preview) {
+        preview.innerHTML = '<div class="mp3-preview">' +
+          '<audio controls src="' + e.target.result + '"></audio>' +
+          '<button class="remove" onclick="clearMp3(\'' + inputId + '\',\'' + previewId + '\')">✕</button>' +
+        '</div>';
+      }
+      if (onLoad) onLoad(e.target.result, f.name);
+      toast('🎵 Музыка жүктөлдү: ' + f.name);
+    };
+    r.readAsDataURL(f);
+  };
+}
+function clearMp3(inputId, previewId) {
+  var input = document.getElementById(inputId);
+  var preview = document.getElementById(previewId);
+  if (input) input.value = '';
+  if (preview) preview.innerHTML = '';
+  if (inputId === 'fMusic') { form.music = ''; form.musicName = ''; }
+  if (inputId === 'newTplMusic') { window._newTplMusicData = null; }
+  if (inputId === 'mp3GlobalFile') { window._globalMp3Data = null; }
+}
+
+function setupMp3Uploader() {
+  var tplInput = document.getElementById('newTplMusic');
+  if (tplInput) {
+    setupMp3Input('newTplMusic', 'newTplMusicPreview', function(dataUrl, fileName) {
+      window._newTplMusicData = { data: dataUrl, name: fileName };
+    });
+  }
+  var globalInput = document.getElementById('mp3GlobalFile');
+  if (globalInput) {
+    setupMp3Input('mp3GlobalFile', 'mp3GlobalPreview', function(dataUrl, fileName) {
+      window._globalMp3Data = { data: dataUrl, name: fileName };
+    });
+  }
+}
+
+function openMp3Uploader() {
+  closeAdmin();
+  document.getElementById('mp3Modal').classList.add('show');
+  document.getElementById('mp3Modal').style.display = 'flex';
+}
+function closeMp3Uploader() {
+  document.getElementById('mp3Modal').classList.remove('show');
+  document.getElementById('mp3Modal').style.display = 'none';
+}
+function applyGlobalMp3() {
+  var urlInput = document.getElementById('mp3GlobalUrl');
+  var url = urlInput ? urlInput.value.trim() : '';
+  var data = window._globalMp3Data;
+  if (!data && !url) return toast('MP3 файл же URL киргизиңиз');
+
+  var musicData = data ? data.data : url;
+  var musicName = data ? data.name : (url.split('/').pop() || 'URL музыка');
+
+  templates.forEach(function(t) {
+    t.music = musicData;
+    t.musicName = musicName;
+  });
+  saveTemplates();
+  renderTemplates();
+  renderAdminTpls();
+  closeMp3Uploader();
+  toast('✅ Бардык шаблондорго музыка кошулду!');
+}
+
+/* ================== ADMIN ================== */
+function openAdmin() {
+  try {
+    const modal = document.getElementById('adminModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('show');
+    if (isAdmin) {
+      document.getElementById('adminLogin').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      document.getElementById('adminTitle').textContent = '⚙️ Админ панели';
+      renderAdminTpls();
+    } else {
+      document.getElementById('adminLogin').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminTitle').textContent = '🔑 Админ кирүү';
+      setTimeout(function() {
+        var inp = document.getElementById('adminPass');
+        if (inp) { inp.value = ''; inp.focus(); }
+      }, 150);
+    }
+  } catch (e) {
+    alert('Ката: ' + e.message);
+  }
+}
+function closeAdmin() {
+  var modal = document.getElementById('adminModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+}
+function loginAdmin() {
+  try {
+    var inp = document.getElementById('adminPass');
+    var p = (inp ? inp.value : '').trim();
+    if (p === adminPass || p === 'admin123' || p === '1234') {
+      isAdmin = true;
+      if (inp) inp.value = '';
+      document.getElementById('adminBtn').textContent = 'Админ ✓';
+      openAdmin();
+      toast('✅ Админ режими күйгүзүлдү');
+    } else {
+      toast('❌ Сырсөз туура эмес');
+      if (inp) { inp.value = ''; inp.focus(); }
+    }
+  } catch (e) {
+    alert('Ката: ' + e.message);
+  }
+}
+function logoutAdmin() {
+  isAdmin = false;
+  freeMode = false;
+  closeAdmin();
+  toast('Админден чыктыңыз');
+}
+function editField(type) {
+  if (type === 'mbank') {
+    const n = prompt('Жаңы MBank:', mbank);
+    if (n) {
+      mbank = n;
+      localStorage.setItem('ch_mbank', n);
+      document.getElementById('mbankShow').textContent = n;
+      document.getElementById('payMbank').textContent = n;
+      toast('MBank жаңыртылды');
+    }
+  } else if (type === 'pass') {
+    const n = prompt('Жаңы сырсөз (мин 4 белги):', adminPass);
+    if (n && n.length >= 4) {
+      adminPass = n;
+      localStorage.setItem('ch_pass', n);
+      toast('Сырсөз өзгөртүлдү');
+    }
+  }
+}
+function renderAdminTpls() {
+  const el = document.getElementById('adminTplList');
+  if (!el) return;
+  if (!Array.isArray(templates)) templates = [];
+  var header = '<div style="font-size:0.8rem;color:#666;margin-bottom:8px;">Жалпы: <b>' + templates.length + '</b> шаблон</div>';
+  el.innerHTML = header + (templates.length ? templates.map(function(t) {
+    var bg = (t.bg && t.bg.length < 200000) ? t.bg : 'https://images.unsplash.com/photo-1519741497674-611481863552?w=100';
+    var hasMusic = t.music ? ' 🎵' : '';
+    return '<div class="admin-item">' +
+      '<img src="' + bg + '" onerror="this.src=\'https://images.unsplash.com/photo-1519741497674-611481863552?w=100\'">' +
+      '<div class="meta">' +
+        '<b>' + (t.name || 'Аты жок') + hasMusic + '</b><br>' +
+        '<span>' + (t.price||0) + ' · ' + (t.envelope||'navy') + ' · ' + (t.effect||'zoom') + ' · ' + ((t.font||'Great Vibes').split(' ')[0]) + '</span>' +
+      '</div>' +
+      '<button class="btn-sm" style="color:#e53935;" onclick="delTpl(\'' + t.id + '\')">🗑️</button>' +
+    '</div>';
+  }).join('') : '<p style="color:#999;text-align:center;">Шаблон жок. Төмөндөн кошуңуз.</p>');
+}
+function delTpl(id) {
+  if (!confirm('Жок кыласызбы?')) return;
+  if (firebaseReady && db) {
+    db.ref('templates/' + id).remove()
+      .then(function() { toast('Жок кылынды (онлайн)'); })
+      .catch(function(e) { toast('Ката: ' + e.message); });
+  } else {
+    templates = templates.filter(t => String(t.id) !== String(id));
+    saveTemplates();
+    renderAdminTpls();
+    renderTemplates();
+    toast('Жок кылынды (локалдык)');
+  }
+}
+
+const DESIGN_PRESETS = [
+  { id:'luxury_navy', name:'Люкс Navy', env:'navy', effect:'zoom', font:'Great Vibes', color:'#f5e6c8', size:'2.8rem', overlay:'Сүйүү · Той', bg:'https://images.unsplash.com/photo-1519741497674-611481863552?w=800', music: DEFAULT_MUSIC, musicName:'Люкс' },
+  { id:'gold_black', name:'Алтын кара', env:'blackgold', effect:'shine', font:'Playfair Display', color:'#d4af37', size:'2.2rem', overlay:'WEDDING DAY', bg:'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800', music: DEFAULT_MUSIC, musicName:'Алтын' },
+  { id:'rose_soft', name:'Роза нежность', env:'rose', effect:'fade', font:'Pinyon Script', color:'#6b2d45', size:'2.8rem', overlay:'Forever', bg:'https://images.unsplash.com/photo-1515934756700-f2a2e4c8a6f4?w=800', music: DEFAULT_MUSIC, musicName:'Роза' },
+  { id:'classic_kraft', name:'Классика', env:'classic', effect:'zoom', font:'Cormorant Garamond', color:'#5c3a0a', size:'2.2rem', overlay:'Тойго чакыруу', bg:'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800', music: DEFAULT_MUSIC, musicName:'Классика' },
+  { id:'emerald', name:'Изумруд', env:'emerald', effect:'3d', font:'Great Vibes', color:'#e8f5e9', size:'2.8rem', overlay:'Бакыт', bg:'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800', music: DEFAULT_MUSIC, musicName:'Изумруд' },
+  { id:'burgundy', name:'Бордо', env:'burgundy', effect:'zoom', font:'Playfair Display', color:'#f5e6c8', size:'2.2rem', overlay:'Салтанат', bg:'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800', music: DEFAULT_MUSIC, musicName:'Бордо' },
+  { id:'ivory', name:'Ivory', env:'ivory', effect:'shine', font:'Montserrat', color:'#4a3728', size:'1.6rem', overlay:'INVITATION', bg:'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800', music: DEFAULT_MUSIC, musicName:'Ivory' },
+  { id:'purple', name:'Кызгылт көк', env:'purple', effect:'fade', font:'Great Vibes', color:'#e8d5ff', size:'2.8rem', overlay:'Махабат', bg:'https://images.unsplash.com/photo-1529636798458-92182e662485?w=800', music: DEFAULT_MUSIC, musicName:'Кызгылт' }
+];
+
+function showAddTpl() {
+  closeAdmin();
+  document.getElementById('addTplModal').classList.add('show');
+  document.getElementById('addTplModal').style.display = 'flex';
+  renderDesignPresets();
+}
+function renderDesignPresets() {
+  const box = document.getElementById('designPresets');
+  if (!box) return;
+  box.innerHTML = DESIGN_PRESETS.map(function(p) {
+    return `<div onclick="applyDesignPreset('${p.id}')" style="border-radius:12px;overflow:hidden;border:2px solid #eee;cursor:pointer;background:#fff;">
+      <div style="height:56px;background-image:url('${p.bg}');background-size:cover;background-position:center;"></div>
+      <div style="padding:6px 8px;font-size:0.72rem;font-weight:600;text-align:center;">${p.name}</div>
+    </div>`;
+  }).join('');
+}
+function applyDesignPreset(id) {
+  const p = DESIGN_PRESETS.find(function(x) { return x.id === id; });
+  if (!p) return;
+  const set = function(sid, val) {
+    const el = document.getElementById(sid);
+    if (el) el.value = val;
+  };
+  set('newTplEnv', p.env);
+  set('newTplEffect', p.effect);
+  set('newTplFont', p.font);
+  set('newTplTextColor', p.color);
+  set('newTplFontSize', p.size);
+  set('newTplOverlay', p.overlay);
+  set('newTplBg', p.bg);
+  if (!document.getElementById('newTplName').value) {
+    document.getElementById('newTplName').value = p.name;
+  }
+  document.querySelectorAll('#designPresets > div').forEach(function(d) {
+    d.style.borderColor = '#eee';
+  });
+  if (event && event.currentTarget) event.currentTarget.style.borderColor = '#c2185b';
+  toast('Пресет: ' + p.name);
+}
+function closeAddTpl() {
+  document.getElementById('addTplModal').classList.remove('show');
+  document.getElementById('addTplModal').style.display = 'none';
+}
+function saveTpl() {
+  try {
+    var nameEl = document.getElementById('newTplName');
+    var name = nameEl ? nameEl.value.trim() : '';
+    if (!name) { toast('Аталышын жазыңыз'); return; }
+
+    var priceEl = document.getElementById('newTplPrice');
+    var price = priceEl ? (parseInt(priceEl.value) || 0) : 0;
+    var bgEl = document.getElementById('newTplBg');
+    var bg = bgEl ? bgEl.value.trim() : '';
+    var fileEl = document.getElementById('newTplFile');
+    var file = (fileEl && fileEl.files && fileEl.files[0]) ? fileEl.files[0] : null;
+    var effect = (document.getElementById('newTplEffect') || {}).value || 'zoom';
+    var envelope = (document.getElementById('newTplEnv') || {}).value || 'navy';
+    var font = (document.getElementById('newTplFont') || {}).value || 'Great Vibes';
+    var textColor = (document.getElementById('newTplTextColor') || {}).value || '#ffffff';
+    var fontSize = (document.getElementById('newTplFontSize') || {}).value || '2.2rem';
+    var overlayEl = document.getElementById('newTplOverlay');
+    var overlay = overlayEl ? overlayEl.value.trim() : '';
+    var musicData = window._newTplMusicData ? window._newTplMusicData.data : null;
+    var musicName = window._newTplMusicData ? window._newTplMusicData.name : null;
+    var musicUrlEl = document.getElementById('newTplMusicUrl');
+    var musicUrl = musicUrlEl ? musicUrlEl.value.trim() : '';
+
+    function finishSave(finalBg, finalMusic, finalMusicName) {
+      var obj = {
+        id: 'tpl_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        name: name,
+        price: price,
+        bg: finalBg || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600',
+        effect: effect,
+        envelope: envelope,
+        font: font,
+        textColor: textColor,
+        fontSize: fontSize,
+        overlay: overlay,
+        createdAt: Date.now(),
+        images: [
+          finalBg || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600',
+          finalBg || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600',
+          finalBg || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600'
+        ]
+      };
+      if (finalMusic) {
+        obj.music = finalMusic;
+        obj.musicName = finalMusicName || 'music';
+      }
+      if (obj.bg && obj.bg.length > 400000) {
+        toast('Сүрөт өтө чоң — дефолт фон колдонулду.');
+        obj.bg = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600';
+      }
+      if (obj.music && obj.music.length > 400000) {
+        delete obj.music;
+        toast('Музыка өтө чоң — өткөрүлдү');
+      }
+
+      if (!Array.isArray(templates)) templates = [];
+      templates.push(obj);
+
+      var ok = false;
+      try { ok = saveTemplates(); } catch (e) { console.error(e); }
+
+      try { renderTemplates(); } catch (e) {}
+      try { renderAdminTpls(); } catch (e) {}
+
+      closeAddTpl();
+      window._newTplMusicData = null;
+
+      if (ok) {
+        toast('✅ Шаблон сакталды! (' + templates.length + ' шаблон)');
+      } else {
+        toast('✅ Убактылуу сакталды. Баракты жаппаңыз!');
+      }
+
+      isAdmin = true;
+      var adminBtn = document.getElementById('adminBtn');
+      if (adminBtn) adminBtn.textContent = 'Админ ✓';
+      showScreen('screenHome');
+      setTimeout(function() {
+        openAdmin();
+        renderAdminTpls();
+        renderTemplates();
+      }, 200);
+    }
+
+    function loadMusicThen(finalBg) {
+      if (musicData) {
+        finishSave(finalBg, musicData, musicName);
+      } else if (musicUrl) {
+        finishSave(finalBg, musicUrl, musicUrl.split('/').pop() || 'URL');
+      } else {
+        finishSave(finalBg, null, null);
+      }
+    }
+
+    if (file) {
+      var r = new FileReader();
+      r.onload = function(e) { loadMusicThen(e.target.result); };
+      r.onerror = function() {
+        toast('Сүрөт окулган жок — URL колдонулууда');
+        loadMusicThen(bg);
+      };
+      r.readAsDataURL(file);
+    } else {
+      loadMusicThen(bg);
+    }
+  } catch (err) {
+    console.error('saveTpl error', err);
+    toast('Ката: ' + (err.message || err));
+    alert('Шаблон сактоо катасы: ' + (err.message || err));
+  }
+}
+
+/* ================== CONVERTER ================== */
+let convDataUrl = null;
+let convType = '';
+
+function openConverter() {
+  closeAdmin();
+  document.getElementById('converterModal').classList.add('show');
+  document.getElementById('converterModal').style.display = 'flex';
+  const fi = document.getElementById('convFile');
+  fi.onchange = function() {
+    const f = this.files[0];
+    if (!f) return;
+    convType = f.type;
+    const r = new FileReader();
+    r.onload = e => {
+      convDataUrl = e.target.result;
+      const prev = document.getElementById('convPreview');
+      prev.style.display = 'block';
+      if (f.type.startsWith('image/')) {
+        prev.innerHTML = `<img id="convImg" src="${convDataUrl}" style="max-width:100%;max-height:180px;border-radius:10px;">`;
+      } else if (f.type.startsWith('video/')) {
+        prev.innerHTML = `<video src="${convDataUrl}" controls style="max-width:100%;max-height:180px;border-radius:10px;"></video>`;
+      } else if (f.type.startsWith('audio/')) {
+        prev.innerHTML = `<audio src="${convDataUrl}" controls style="width:100%;"></audio><div style="margin-top:6px;font-size:0.8rem;">${f.name}</div>`;
+      } else {
+        prev.innerHTML = `<div style="padding:20px;color:#666;">${f.name} (${f.type || 'файл'})</div>`;
+      }
+      toast('Файл жүктөлдү');
+    };
+    r.readAsDataURL(f);
+  };
+}
+function closeConverter() {
+  document.getElementById('converterModal').classList.remove('show');
+  document.getElementById('converterModal').style.display = 'none';
+}
+
+function applyEffect() {
+  const img = document.getElementById('convImg');
+  if (!img) return toast('Адегенде сүрөт жүктөңүз');
+  const fx = document.getElementById('convEffect').value;
+  img.className = '';
+  if (fx === 'zoom') img.classList.add('fx-zoom');
+  else if (fx === 'shine') { img.parentElement.classList.add('fx-shine'); img.classList.add('fx-shine'); }
+  else if (fx === '3d') img.classList.add('fx-3d');
+  else if (fx === 'fade') img.classList.add('fx-fade');
+  toast('Эффект колдонулду: ' + fx);
+}
+
+function convertTo(format) {
+  if (!convDataUrl) return toast('Адегенде файл жүктөңүз');
+  if (format === 'json') {
+    const data = {
+      name: 'converted',
+      type: convType,
+      dataUrl: convDataUrl.slice(0, 100) + '...',
+      fullLength: convDataUrl.length,
+      effect: document.getElementById('convEffect').value,
+      created: new Date().toISOString()
+    };
+    downloadBlob(JSON.stringify(data, null, 2), 'convert.json', 'application/json');
+    toast('JSON жүктөлдү');
+    return;
+  }
+  if (!convType.startsWith('image/')) return toast('WEBP/JPEG үчүн сүрөт керек');
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const mime = format === 'webp' ? 'image/webp' : 'image/jpeg';
+    const quality = 0.9;
+    canvas.toBlob(function(blob) {
+      if (!blob) return toast('Конвертация ишке ашкан жок');
+      const ext = format === 'webp' ? 'webp' : 'jpg';
+      downloadBlob(blob, 'converted.' + ext, mime);
+      toast(format.toUpperCase() + ' жүктөлдү');
+    }, mime, quality);
+  };
+  img.src = convDataUrl;
+}
+
+function exportInviteJSON() {
+  const data = {
+    form: form,
+    templates: templates.map(t => ({ id: t.id, name: t.name, type: t.type, price: t.price })),
+    mbank: mbank,
+    exportedAt: new Date().toISOString()
+  };
+  downloadBlob(JSON.stringify(data, null, 2), 'chakyr-uu-invite.json', 'application/json');
+  toast('Чакыруу JSON жүктөлдү');
+}
+
+function downloadBlob(data, filename, mime) {
+  const blob = data instanceof Blob ? data : new Blob([data], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ================== HELPERS ================== */
+function changeInviteFont(fontValue) {
+  const selectors = [
+    '.inv-text', '.rsvp-opt', '.rsvp-box', '.rsvp-box h3',
+    '.date-card', '.date-card .label', '.date-card .big',
+    '.cd-item', '.cd-item .num', '.cd-item .lbl',
+    '.hosts-name', '.day-badge', '.btn-rsvp',
+    '#invPlace', '#invAddress', '#invDate', '#invTime', '#invDay', '#invHosts', '#invText',
+    '.countdown', '.inv-section', '.bottom-bar',
+    '.elegant-title'
+  ];
+  const content = document.getElementById('inviteContent');
+  if (content) {
+    content.querySelectorAll('div, p, span, h3, a, button, label').forEach(function(el) {
+      if (el.classList.contains('names') || el.classList.contains('seal-script') ||
+          el.classList.contains('amp') || el.id === 'crestLetters' ||
+          el.closest('.names') || el.closest('.seal-script')) {
+        return;
+      }
+      el.style.setProperty('font-family', fontValue, 'important');
+    });
+  }
+  selectors.forEach(function(sel) {
+    document.querySelectorAll(sel).forEach(function(el) {
+      el.style.setProperty('font-family', fontValue, 'important');
+    });
+  });
+  localStorage.setItem('ch_invite_font', fontValue);
+  toast('Шрифт өзгөртүлдү ✓');
+}
+
+(function restoreInviteFont() {
+  const saved = localStorage.getItem('ch_invite_font');
+  if (saved) {
+    setTimeout(function() {
+      const sel = document.getElementById('fontSwitcher');
+      if (sel) {
+        sel.value = saved;
+        changeInviteFont(saved);
+      }
+    }, 800);
+  }
+})();
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
